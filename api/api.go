@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -9,13 +8,13 @@ import (
 )
 
 func main() {
-	router := mux.NewRouter()
 
-	router.HandleFunc("/api/v1/plots", getPlots).Methods("GET")
+	//Allocating memory space to map
+	Space = make(map[string]SpaceInfo)
+
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/plots", GetAllPlots).Methods("GET")
+	router.HandleFunc("/api/v1/plots/{plotid}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 
 	log.Fatal(http.ListenAndServe(":5000", router))
-}
-
-func getPlots(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World")
 }

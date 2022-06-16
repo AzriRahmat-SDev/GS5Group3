@@ -1,18 +1,8 @@
-package functions
+package main
 
 import (
 	"database/sql"
-	"encoding/json"
-	"net/http"
 )
-
-type SpaceInfo struct {
-	VenueName string
-	PlotID    string
-	Address   string
-}
-
-var Space map[string]SpaceInfo
 
 func OpenDatabase() (*sql.DB, error) {
 	db, err := sql.Open("//name of DB", "")
@@ -33,18 +23,5 @@ func PopulateData(db *sql.DB) {
 		}
 		Space[space.PlotID] = space
 	}
-
-}
-
-func GetAllSpaces(w http.ResponseWriter, r *http.Request) {
-
-	db, err := OpenDatabase()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	defer db.Close()
-	PopulateData(db)
-	json.NewEncoder(w).Encode(Space)
 
 }
