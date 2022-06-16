@@ -1,0 +1,6 @@
+CREATE TABLE plots (
+    PlotID VARCHAR(6) NOT NULL, 
+    VenueName VARCHAR(255) NOT NULL,
+    Address VARCHAR(255) NOT NULL,
+    UNIQUE (PlotID)
+);
