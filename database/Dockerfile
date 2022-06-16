@@ -1,7 +1,7 @@
 FROM mysql
 
 # Add database
-ENV MYSQL_DATABASE bookings_db
+ENV MYSQL_DATABASE database
 
 # Add the content of the sql-scripts/directory to your image
 # All scripts in docker-entrypoint-initdb.d/ are automatically
