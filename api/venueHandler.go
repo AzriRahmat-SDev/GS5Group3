@@ -32,6 +32,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		PopulateData(db)
 		if _, ok := plotMap[params["plotid"]]; ok {
+			fmt.Println("PLOT ID : ", params["plotid"])
 			json.NewEncoder(w).Encode(plotMap[params["plotid"]])
 		} else {
 			w.WriteHeader(http.StatusNotFound)
