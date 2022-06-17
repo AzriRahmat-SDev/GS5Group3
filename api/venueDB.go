@@ -107,22 +107,4 @@ func RunTests() {
 	EditPlotVenueName(OpenVenueDB(), "ALJ001", "Aljunieeed")
 	EditPlotVenueName(OpenVenueDB(), "ALJ001", "Aljunied Park")
 	DeletePlot(OpenVenueDB(), "ALJ027")
-	//RefreshPlots()
-}
-
-func RefreshPlots() {
-
-	PopulateData(OpenVenueDB())
-
-	for k := range plotMap {
-		p := Plot{
-			PlotID:    k,
-			VenueName: plotMap[k].VenueName,
-			Address:   plotMap[k].Address,
-		}
-		PlotList = append(PlotList, p)
-	}
-	for x, y := range PlotList {
-		fmt.Println(x, y)
-	}
 }
