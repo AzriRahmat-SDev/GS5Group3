@@ -6,3 +6,4 @@ CREATE TABLE bookings (
     EndDate VARCHAR(10) NOT NULL,
     PRIMARY KEY (BookingID)
 );
+
