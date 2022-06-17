@@ -1,6 +1,6 @@
 FROM mysql
 
-# Add database
+# Add database called database
 ENV MYSQL_DATABASE database
 
 # Add the content of the sql-scripts/directory to your image
