@@ -17,8 +17,10 @@ func main() {
 	router.HandleFunc("/api/v1/plots", GetAllPlots).Methods("GET")
 	router.HandleFunc("/api/v1/plots/{plotid}/{address}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 	router.HandleFunc("/api/v1/plots/{plotid}/{VenueName}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
-	router.HandleFunc("/api/v1/bookings", getBookings).Methods("GET")
-	router.HandleFunc("/api/v1/bookings/{BookingID}", bookingHandler).Methods("GET", "POST", "PUT", "DELETE")
+	router.HandleFunc("/api/v1/bookings", getHandler).Methods("GET")
+	router.HandleFunc("/api/v1/bookings/booking/{BookingID}", bookingHandler).Methods("GET", "POST", "PUT", "DELETE")
+	router.HandleFunc("/api/v1/bookings/user/{UserID}", getHandler).Methods("GET")
+	router.HandleFunc("/api/v1/bookings/plot/{PlotID}", getHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":5000", router))
 }
