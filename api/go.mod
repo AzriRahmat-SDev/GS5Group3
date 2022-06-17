@@ -1,4 +1,4 @@
-module api
+module main
 
 go 1.18
 

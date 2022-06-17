@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"encoding/json"
@@ -103,7 +103,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 					EditPlotAddress(db, newPlot.PlotID, newPlot.VenueInfo.Address)
 					EditPlotVenueName(db, newPlot.PlotID, newPlot.VenueInfo.VenueName)
 					//unsure about this portion need to ask (might need to add above too)
-					plotMap[params["plotid"]] = newPlot.PlotID
+					//plotMap[params["plotid"]] = newPlot.PlotID
 					//unsure about this portion need to ask
 					w.WriteHeader(http.StatusAccepted)
 					w.Write([]byte("201 - Plot added: " + params["plotid"]))
