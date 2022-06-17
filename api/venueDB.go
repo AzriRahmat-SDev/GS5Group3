@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"database/sql"
@@ -78,7 +78,7 @@ func nextPlotID(db *sql.DB, venue string) int {
 	return 0
 }
 
-func FillMap(db *sql.DB) {
+func PopulateData(db *sql.DB) {
 	for k := range plotMap {
 		delete(plotMap, k)
 	}
@@ -95,12 +95,6 @@ func FillMap(db *sql.DB) {
 		}
 		plotMap[p.PlotID] = p.VenueInfo
 	}
-}
-
-func main() {
-
-	plotMap = make(map[string]VenueInformation)
-	RunTests()
 }
 
 func RunTests() {
@@ -123,7 +117,7 @@ func RunTests() {
 
 func RefreshPlots() {
 
-	FillMap(OpenVenueDB())
+	PopulateData(OpenVenueDB())
 
 	for k := range plotMap {
 		p := Plot{
