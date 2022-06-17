@@ -17,8 +17,6 @@ func startServer() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/plots", GetAllPlots).Methods("GET")
-	// router.HandleFunc("/api/v1/plots/{plotid}/{address}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
-	// router.HandleFunc("/api/v1/plots/{plotid}/{venuename}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 	router.HandleFunc("/api/v1/plots/{plotid}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 
 	router.HandleFunc("/api/v1/bookings", getBookings).Methods("GET")

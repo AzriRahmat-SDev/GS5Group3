@@ -28,7 +28,6 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	params := mux.Vars(r)
-	fmt.Println("Plot Handler?")
 	fmt.Fprintf(w, r.Method)
 
 	if r.Method == "GET" {
@@ -52,70 +51,71 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("404 - No Plot found"))
 		}
+	}
 
-		if r.Header.Get("Content-type") == "application/json" {
+	if r.Header.Get("Content-type") == "application/json" {
+		PopulateData(db)
+		if r.Method == "POST" {
+			var newPlot Plot
+			reqBody, err := ioutil.ReadAll(r.Body)
+			if err == nil {
+				json.Unmarshal(reqBody, &newPlot)
+				if newPlot.PlotID == "" {
+					w.WriteHeader(http.StatusUnprocessableEntity)
+					w.Write([]byte("422 - Please supply Venue or Address information in JSON format"))
+					return
+				}
+				//basically reads(from client) if plot id does not exist(in DB)
+				if _, ok := plotMap[params["plotid"]]; !ok {
+					InsertPlot(db, newPlot)
+					fmt.Println("Insert was successful")
+					plotMap[params["plotid"]] = newPlot
+					w.WriteHeader(http.StatusCreated)
+					w.Write([]byte("201 - Plot added: " + params["plotid"]))
+				} else {
+					w.WriteHeader(http.StatusConflict)
+					w.Write([]byte("409 - Duplicate plot ID"))
+				}
+			} else {
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				w.Write([]byte("422 - Please supply Plot information " + "in JSON format"))
+			}
+		}
+		//PUT request here
+		if r.Method == "PUT" {
 			PopulateData(db)
-			if r.Method == "POST" {
-				var newPlot Plot
-				reqBody, err := ioutil.ReadAll(r.Body)
-				if err == nil {
-					json.Unmarshal(reqBody, &newPlot)
-					if newPlot.VenueName == "" || newPlot.Address == "" {
-						w.WriteHeader(http.StatusUnprocessableEntity)
-						w.Write([]byte("422 - Please supply Venue or Address information in JSON format"))
-						return
-					}
-					//basically reads(from client) if plot id does not exist(in DB)
-					if _, ok := plotMap[params["plotid"]]; !ok {
-						InsertPlot(db, newPlot)
-						fmt.Println("Insert was successful")
-						w.WriteHeader(http.StatusCreated)
-						w.Write([]byte("201 - Plot added: " + params["plotid"]))
-					} else {
-						w.WriteHeader(http.StatusConflict)
-						w.Write([]byte("409 - Duplicate plot ID"))
-					}
-				} else {
+			var newPlot Plot
+			reqBody, err := ioutil.ReadAll(r.Body)
+
+			if err == nil {
+
+				json.Unmarshal(reqBody, &newPlot)
+
+				if newPlot.VenueName == "" || newPlot.Address == "" {
 					w.WriteHeader(http.StatusUnprocessableEntity)
-					w.Write([]byte("422 - Please supply Plot information " + "in JSON format"))
-				}
-			}
-			//PUT request here
-			if r.Method == "PUT" {
-				PopulateData(db)
-				var newPlot Plot
-				reqBody, err := ioutil.ReadAll(r.Body)
-
-				if err == nil {
-
-					json.Unmarshal(reqBody, &newPlot)
-
-					if newPlot.VenueName == "" || newPlot.Address == "" {
-						w.WriteHeader(http.StatusUnprocessableEntity)
-						w.Write([]byte("422 - Please supply Plot " + "information " + "in JSON format"))
-						return
-					}
-
-					if _, ok := plotMap[params["plotid"]]; !ok {
-						InsertPlot(db, newPlot)
-						fmt.Println("Insert was successful")
-						w.WriteHeader(http.StatusCreated)
-						w.Write([]byte("201 - Plot added: " + params["plotid"]))
-					} else {
-						EditPlotAddress(db, newPlot.PlotID, newPlot.Address)
-						EditPlotVenueName(db, newPlot.PlotID, newPlot.VenueName)
-						//unsure about this portion need to ask (might need to add above too)
-						//plotMap[params["plotid"]] = newPlot.PlotID
-						//unsure about this portion need to ask
-						w.WriteHeader(http.StatusAccepted)
-						w.Write([]byte("201 - Plot added: " + params["plotid"]))
-					}
-				} else {
-					w.WriteHeader(http.StatusUnprocessableEntity)
-					w.Write([]byte("422 - Please supply Plot information " + "in JSON format"))
+					w.Write([]byte("422 - Please supply Plot " + "information " + "in JSON format"))
+					return
 				}
 
+				if _, ok := plotMap[params["plotid"]]; !ok {
+					InsertPlot(db, newPlot)
+					fmt.Println("Insert was successful")
+					w.WriteHeader(http.StatusCreated)
+					w.Write([]byte("201 - Plot added: " + params["plotid"]))
+				} else {
+					EditPlotAddress(db, newPlot.PlotID, newPlot.Address)
+					EditPlotVenueName(db, newPlot.PlotID, newPlot.VenueName)
+					//unsure about this portion need to ask (might need to add above too)
+					//plotMap[params["plotid"]] = newPlot.PlotID
+					//unsure about this portion need to ask
+					w.WriteHeader(http.StatusAccepted)
+					w.Write([]byte("201 - Plot added: " + params["plotid"]))
+				}
+			} else {
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				w.Write([]byte("422 - Please supply Plot information " + "in JSON format"))
 			}
+
 		}
 	}
 }
