@@ -10,14 +10,11 @@ import (
 
 type Plot struct {
 	PlotID    string `json:"PlotID"`
-	VenueInfo VenueInformation
-}
-type VenueInformation struct {
 	VenueName string `json:"VenueName"`
 	Address   string `json:"Address"`
 }
 
-var plotMap map[string]VenueInformation
+var plotMap map[string]Plot
 
 var PlotList []Plot
 
@@ -34,7 +31,7 @@ func OpenVenueDB() *sql.DB {
 }
 
 func InsertPlot(db *sql.DB, p Plot) {
-	query := fmt.Sprintf("INSERT INTO plots (PlotID, VenueName, Address) VALUES ('%s', '%s', '%s')", p.PlotID, p.VenueInfo.VenueName, p.VenueInfo.Address)
+	query := fmt.Sprintf("INSERT INTO plots (PlotID, VenueName, Address) VALUES ('%s', '%s', '%s')", p.PlotID, p.VenueName, p.Address)
 	_, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -89,21 +86,19 @@ func PopulateData(db *sql.DB) {
 
 	for results.Next() {
 		var p Plot
-		err := results.Scan(&p.PlotID, &p.VenueInfo.VenueName, &p.VenueInfo.Address)
+		err := results.Scan(&p.PlotID, &p.VenueName, &p.Address)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		plotMap[p.PlotID] = p.VenueInfo
+		plotMap[p.PlotID] = p
 	}
 }
 
 func RunTests() {
 	s := Plot{
-		PlotID: "ALJ027",
-		VenueInfo: VenueInformation{
-			VenueName: "Aljunied Park",
-			Address:   "Aljunied Road, Happy Garden Estate, 389842",
-		},
+		PlotID:    "ALJ027",
+		VenueName: "Aljunied Park",
+		Address:   "Aljunied Road, Happy Garden Estate, 389842",
 	}
 
 	InsertPlot(OpenVenueDB(), s)
@@ -121,11 +116,9 @@ func RefreshPlots() {
 
 	for k := range plotMap {
 		p := Plot{
-			PlotID: k,
-			VenueInfo: VenueInformation{
-				VenueName: plotMap[k].VenueName,
-				Address:   plotMap[k].Address,
-			},
+			PlotID:    k,
+			VenueName: plotMap[k].VenueName,
+			Address:   plotMap[k].Address,
 		}
 		PlotList = append(PlotList, p)
 	}
