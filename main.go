@@ -18,21 +18,24 @@ func init() {
 func main() {
 	r := mux.NewRouter()
 	//viewing page. Has the option to go into adminlogin
-	r.HandleFunc("/", functions.IndexPage)
+	//r.HandleFunc("/", functions.IndexPage)
 
 	//account funtions
-	r.HandleFunc("/createuser", functions.CreateUser)
+
 	r.HandleFunc("/signup", functions.SignUp)
-	r.HandleFunc("/login", functions.login)
-	r.HandleFunc("/accountmanagement", functions.AccountManagement)
-	r.HandleFunc("/bookings", functions.Bookings) // Holds both current and booking history
 
-	//User Area functions
-	r.HandleFunc("/bookspace", functions.BookSpace)
+	r.HandleFunc("/loginauth", functions.LoginAuth)
+	r.HandleFunc("/allusers", functions.AllUsers)
+	r.HandleFunc("/delete/", functions.DeleteRecord)
+	// r.HandleFunc("/accountmanagement", functions.AccountManagement)
+	// r.HandleFunc("/bookings", functions.Bookings) // Holds both current and booking history
 
-	//Admin Area
-	r.HandleFunc("/adminlogin", functions.AdminLogin)
-	r.HandleFunc("/adminarea", functions.AdminArea)
+	// //User Area functions
+	// r.HandleFunc("/bookspace", functions.BookSpace)
+
+	// //Admin Area
+	// r.HandleFunc("/adminlogin", functions.AdminLogin)
+	// r.HandleFunc("/adminarea", functions.AdminArea)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

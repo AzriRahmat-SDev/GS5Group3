@@ -7,3 +7,4 @@ CREATE TABLE bookings (
     LeaseCompleted VARCHAR(5),
     PRIMARY KEY (BookingID)
 );
+
