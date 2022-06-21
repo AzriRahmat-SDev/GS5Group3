@@ -27,6 +27,8 @@ func main() {
 	r.HandleFunc("/loginauth", functions.LoginAuth)
 	r.HandleFunc("/allusers", functions.AllUsers)
 	r.HandleFunc("/delete/", functions.DeleteRecord)
+	r.HandleFunc("/update/", functions.Update)
+	r.HandleFunc("/updateresult/", functions.UpdateResult)
 	// r.HandleFunc("/accountmanagement", functions.AccountManagement)
 	// r.HandleFunc("/bookings", functions.Bookings) // Holds both current and booking history
 
