@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Community Gardens</title>
+</head>
+<body>
+
+<h1>Delete Booking</h1>
+
+<p>Booking ID: {{ .allInfo.BookingID }}</p>
+<p>Venue: {{ .allInfo.VenueName }}</p>
+<p>Address: {{ .allInfo.Address }}</p>
+<p>Plot ID: {{ .allInfo.PlotID }}</p>
+<p>Current Bookings:</p>
+
+<table>
+    <tr>
+        <th>Booking ID</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+    </tr>
+    {{ range .allInfo.CurrentLeases.Bookings }}
+    <tr>
+        <td>{{ .BookingID }}</td>
+        <td>{{ .StartDate }}</td>
+        <td>{{ .EndDate }}</td>
+    </tr>
+    {{ end }}
+</table>
+
+<form method = "POST">
+
+<br />
+
+<p>Are you sure you want to delete booking ID {{ .allInfo.BookingID }}?</p>
+
+<br />
+
+<input type="submit" value="Yes">
+
+</form>
+
+</body>
+</html>
