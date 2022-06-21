@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"log"
@@ -16,7 +16,7 @@ func startServer() {
 	//RunTests()
 
 	router := mux.NewRouter()
-  
+
 	router.HandleFunc("/api/v1/plots", GetAllPlots).Methods("GET")
 	router.HandleFunc("/api/v1/plots/{plotid}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 
