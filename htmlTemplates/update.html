@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Update Product</h2>
+
+    <form action="/updateresult/?username={{.Username}}" method="POST">
+      <label for="name">Name:</label><br />
+      <input
+        type="text"
+        id="nameName"
+        name="nameName"
+        value="{{.Name}}"
+      /><br />
+      <label for="Username">Username:</label><br />
+      <input
+        type="text"
+        id="UserName"
+        name="userName"
+        value="{{.Username}}"
+      /><br />
+      <label for="Password">Password:</label><br />
+      <input type="password" id="passwordName" name="passwordName" /><br />
+      <label for="Email">Email:</label><br />
+      <input
+        type="text"
+        id="emailName"
+        name="emailName"
+        value="{{.Email}}"
+      /><br />
+      <input type="submit" value="Update Product" />
+    </form>
+    <br /><br /><br />
+    <a href="/browse">Back to home</a>
+  </body>
+</html>
