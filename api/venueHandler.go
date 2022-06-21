@@ -91,25 +91,25 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 
 				json.Unmarshal(reqBody, &newPlot)
 
-				if newPlot.VenueName == "" || newPlot.Address == "" {
+				// if both fields are empty
+				if newPlot.VenueName == "" && newPlot.Address == "" {
 					w.WriteHeader(http.StatusUnprocessableEntity)
 					w.Write([]byte("422 - Please supply Plot " + "information " + "in JSON format"))
 					return
 				}
-
 				if _, ok := plotMap[params["plotid"]]; !ok {
 					InsertPlot(db, newPlot)
 					fmt.Println("Insert was successful")
 					w.WriteHeader(http.StatusCreated)
 					w.Write([]byte("201 - Plot added: " + params["plotid"]))
 				} else {
-					EditPlotAddress(db, newPlot.PlotID, newPlot.Address)
-					EditPlotVenueName(db, newPlot.PlotID, newPlot.VenueName)
-					//unsure about this portion need to ask (might need to add above too)
-					//plotMap[params["plotid"]] = newPlot.PlotID
-					//unsure about this portion need to ask
-					w.WriteHeader(http.StatusAccepted)
-					w.Write([]byte("201 - Plot added: " + params["plotid"]))
+					if newPlot.Address != "" {
+						EditPlotAddress(db, params["plotid"], newPlot.Address)
+					}
+					if newPlot.VenueName != "" {
+						EditPlotVenueName(db, params["plotid"], newPlot.VenueName)
+					}
+					w.Write([]byte("201-" + params["plotid"] + " has been updated." + newPlot.Address + newPlot.VenueName))
 				}
 			} else {
 				w.WriteHeader(http.StatusUnprocessableEntity)
