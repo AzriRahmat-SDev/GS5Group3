@@ -13,13 +13,10 @@ import (
 //Declaring Map Existence globally
 
 func GetAllPlots(w http.ResponseWriter, r *http.Request) {
-
 	db := OpenVenueDB()
-
 	defer db.Close()
 	PopulateData(db)
 	json.NewEncoder(w).Encode(plotMap)
-
 }
 
 func PlotHandler(w http.ResponseWriter, r *http.Request) {

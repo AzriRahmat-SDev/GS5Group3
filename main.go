@@ -1,7 +1,7 @@
 package main
 
 import (
-	"GitHub/GS5Group3/functions"
+	"GS5Group3/functions"
 	"log"
 	"net/http"
 	"text/template"
@@ -29,6 +29,7 @@ func main() {
 	r.HandleFunc("/delete/", functions.DeleteRecord)
 	r.HandleFunc("/update/", functions.Update)
 	r.HandleFunc("/updateresult/", functions.UpdateResult)
+	r.HandleFunc("/homepage/", functions.Homepage)
 	// r.HandleFunc("/accountmanagement", functions.AccountManagement)
 	// r.HandleFunc("/bookings", functions.Bookings) // Holds both current and booking history
 
