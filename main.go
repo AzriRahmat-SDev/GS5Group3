@@ -30,7 +30,9 @@ func main() {
 	r.HandleFunc("/update/", functions.Update)
 	r.HandleFunc("/updateresult/", functions.UpdateResult)
 	// r.HandleFunc("/accountmanagement", functions.AccountManagement)
-	// r.HandleFunc("/bookings", functions.Bookings) // Holds both current and booking history
+	r.HandleFunc("/newbooking/", functions.NewBooking)
+	r.HandleFunc("/editbooking/", functions.EditBooking)
+	r.HandleFunc("/deletebooking/", functions.DeleteBooking)
 
 	// //User Area functions
 	// r.HandleFunc("/bookspace", functions.BookSpace)
