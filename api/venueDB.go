@@ -19,7 +19,7 @@ var plotMap map[string]Plot
 var PlotList []Plot
 
 func OpenVenueDB() *sql.DB {
-	db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/venue_db")
+	db, err := sql.Open("mysql", "azri:password@tcp(127.0.0.1:3306)/venue_db")
 
 	if err != nil {
 		log.Fatal(err.Error())
