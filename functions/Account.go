@@ -33,10 +33,12 @@ func init() {
 }
 func connectUserDB() *sql.DB {
 	var err error
-	db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/goliveuserdb")
+	db, err = sql.Open("mysql", "root:password@tcp(localhost:32769)/database")
 	if err != nil {
 		panic(err.Error())
 	}
+
+	fmt.Println("connected to user db")
 	return db
 }
 
@@ -116,7 +118,7 @@ func AllUsers(res http.ResponseWriter, req *http.Request) {
 	defer db.Close()
 	fmt.Println("*****AllUsesHandler running*****")
 	if req.Method == http.MethodGet {
-		results, err := db.Query("SELECT Name, Username, Email FROM goliveuserdb.users")
+		results, err := db.Query("SELECT Name, Username, Email FROM users")
 		defer results.Close()
 		if err != nil {
 			panic("Error in Allusers Query")
@@ -147,7 +149,7 @@ func DeleteRecord(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	username := req.FormValue("username")
 
-	stmt := fmt.Sprintf("DELETE FROM  goliveuserdb.users WHERE (`Username` = '%v')", username)
+	stmt := fmt.Sprintf("DELETE FROM users WHERE (`Username` = '%v')", username)
 	result, err := db.Query(stmt)
 	defer result.Close()
 	if err != nil {
@@ -188,7 +190,7 @@ func UpdateResult(res http.ResponseWriter, req *http.Request) {
 	username := req.FormValue("userName")
 	password := req.FormValue("passwordName")
 	email := req.FormValue("emailName")
-	stmt := fmt.Sprintf("UPDATE goliveuserdb.users SET name= '%v', Username = '%v', Password = '%v', Email = '%v' WHERE Username = '%v';", name, username, string(password), email, username)
+	stmt := fmt.Sprintf("UPDATE users SET name= '%v', Username = '%v', Password = '%v', Email = '%v' WHERE Username = '%v';", name, username, string(password), email, username)
 	result, err := db.Query(stmt)
 	result.Close()
 	if err != nil {
