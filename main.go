@@ -30,18 +30,19 @@ func main() {
 
 	r.HandleFunc("/signup", functions.SignUp)
 
-	r.HandleFunc("/loginauth", functions.LoginAuth)
-	r.HandleFunc("/allusers", functions.AllUsers)
-	r.HandleFunc("/delete/", functions.DeleteRecord)
-	r.HandleFunc("/update/", functions.Update)
-	r.HandleFunc("/updateresult/", functions.UpdateResult)
-	r.HandleFunc("/homepage/", functions.Homepage)
+	r.HandleFunc("/loginauth", functions.LoginAuth)        //both admin and users
+	r.HandleFunc("/allusers", functions.AllUsers)          //only admin
+	r.HandleFunc("/delete/", functions.DeleteRecord)       //only admin
+	r.HandleFunc("/update/", functions.Update)             //both admin and users
+	r.HandleFunc("/updateresult/", functions.UpdateResult) //both admin and users
+	r.HandleFunc("/homepage/", functions.Homepage)         //only users
 	// r.HandleFunc("/accountmanagement", functions.AccountManagement)
 	// r.HandleFunc("/bookings", functions.Bookings) // Holds both current and booking history
 	r.HandleFunc("/newbooking/", functions.NewBooking)
 	r.HandleFunc("/editbooking/", functions.EditBooking)
 	r.HandleFunc("/deletebooking/", functions.DeleteBooking)
 	r.HandleFunc("/logout", functions.Logout)
+	r.HandleFunc("/logoutAdmin", functions.LogoutAdmin)
 
 	// //User Area functions
 	// r.HandleFunc("/bookspace", functions.BookSpace)

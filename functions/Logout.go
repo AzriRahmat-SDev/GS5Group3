@@ -13,3 +13,15 @@ func Logout(res http.ResponseWriter, req *http.Request) {
 
 	http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
 }
+
+func LogoutAdmin(res http.ResponseWriter, req *http.Request) {
+	myCookieAdmin := &http.Cookie{
+		Name:   "myCookieAdmin",
+		Value:  "",
+		MaxAge: -1,
+	}
+
+	http.SetCookie(res, myCookieAdmin)
+
+	http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
+}

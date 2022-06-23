@@ -41,9 +41,9 @@ type Plot struct {
 	Address   string `json:"Address"`
 }
 
-const apiURL string = "http://localhost:5000/api/v1/"
-const baseURL string = "http://localhost:5000/api/v1/bookings/"
-const plotsAPI string = "http://localhost:5000/api/v1/plots/"
+const apiURL string = "http://localhost:5001/api/v1/"
+const baseURL string = "http://localhost:5001/api/v1/bookings/"
+const plotsAPI string = "http://localhost:5001/api/v1/plots/"
 
 func NewBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries

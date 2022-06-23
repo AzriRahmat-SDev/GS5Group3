@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const baseURL = "http://localhost:5000/api/v1/"
+const baseURL = "http://localhost:5001/api/v1/"
 
 func StartServer() {
 
@@ -25,7 +25,7 @@ func StartServer() {
 	router.HandleFunc("/api/v1/bookings/user/{Username}", getHandler).Methods("GET")
 	router.HandleFunc("/api/v1/bookings/plot/{PlotID}", getHandler).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":5000", router))
+	log.Fatal(http.ListenAndServe(":5001", router))
 
 }
 
