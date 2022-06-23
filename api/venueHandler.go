@@ -25,7 +25,6 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	params := mux.Vars(r)
-	fmt.Fprintf(w, r.Method)
 
 	if r.Method == "GET" {
 		PopulateData(db)
