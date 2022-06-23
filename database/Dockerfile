@@ -1,4 +1,8 @@
+#For windows Users
 FROM mysql
+
+#For mac Users
+#FROM mysql:oracle
 
 # Add database called database
 ENV MYSQL_DATABASE database

@@ -110,6 +110,7 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 		if username == "Admin" {
 			fmt.Println("Admin user correct")
 			if password == "Admin123!@#" {
+				//tpl.ExecuteTemplate(res, "restricted.html", "You dont belong here")
 				http.Redirect(res, req, "/allusers", 303)
 				return
 			}
