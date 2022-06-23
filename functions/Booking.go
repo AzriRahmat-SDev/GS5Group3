@@ -266,7 +266,6 @@ func callPlotsAPI(PlotID string) (plot Plot) {
 			fmt.Println(err)
 		}
 
-		data = data[3:] // remove method that gets returned in front of JSON object
 		json.Unmarshal(data, &plot)
 
 		response.Body.Close()
