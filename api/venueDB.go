@@ -93,18 +93,3 @@ func PopulateData(db *sql.DB) {
 		plotMap[p.PlotID] = p
 	}
 }
-
-func RunTests() {
-	s := Plot{
-		PlotID:    "ALJ027",
-		VenueName: "Aljunied Park",
-		Address:   "Aljunied Road, Happy Garden Estate, 389842",
-	}
-
-	InsertPlot(OpenVenueDB(), s)
-	EditPlotAddress(OpenVenueDB(), "ALJ001", "Aljunieeed Road, Happy Garden Estate, 389842")
-	EditPlotAddress(OpenVenueDB(), "ALJ001", "Aljunied Road, Happy Garden Estate, 389842")
-	EditPlotVenueName(OpenVenueDB(), "ALJ001", "Aljunieeed")
-	EditPlotVenueName(OpenVenueDB(), "ALJ001", "Aljunied Park")
-	DeletePlot(OpenVenueDB(), "ALJ027")
-}
