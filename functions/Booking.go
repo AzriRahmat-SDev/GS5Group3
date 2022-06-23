@@ -41,6 +41,7 @@ type Plot struct {
 	Address   string `json:"Address"`
 }
 
+const apiURL string = "http://localhost:5000/api/v1/"
 const baseURL string = "http://localhost:5000/api/v1/bookings/"
 const plotsAPI string = "http://localhost:5000/api/v1/plots/"
 
@@ -50,54 +51,11 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 	PlotID := req.FormValue("plot")
 
 	// pull bookings for plot
-	var tempLeases bookings
-
-	response, err := http.Get(baseURL + "plot/" + PlotID)
-
-	if err == nil {
-		data, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		json.Unmarshal(data, &tempLeases)
-
-		response.Body.Close()
-	} else {
-		fmt.Println(err)
-	}
-
-	var availableLeases bookings
-
-	for _, v := range tempLeases.Bookings {
-		leaseBool, err := strconv.ParseBool(v.LeaseCompleted)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		if leaseBool == false {
-			availableLeases.Bookings = append(availableLeases.Bookings, v)
-		}
-	}
+	leases := callBookingsAPI("byPlot", PlotID)
+	currentLeases := onlyCurrentLeases(leases)
 
 	// pull plot info
-	var plot Plot
-
-	response, err = http.Get(plotsAPI + PlotID)
-
-	if err == nil {
-		data, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		data = data[3:] // remove method that gets returned in front of JSON object
-		json.Unmarshal(data, &plot)
-
-		response.Body.Close()
-	} else {
-		fmt.Println(err)
-	}
+	plot := callPlotsAPI(PlotID)
 
 	allInfo := map[string]allInfo{
 		"allInfo": {
@@ -109,7 +67,7 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 			Address:       plot.Address,
 			StartDate:     "",
 			EndDate:       "",
-			CurrentLeases: availableLeases,
+			CurrentLeases: currentLeases,
 		},
 	}
 
@@ -118,20 +76,9 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 		StartDate := req.FormValue("StartDate")
 		EndDate := req.FormValue("EndDate")
 
-		newBooking := booking{
-			PlotID:    PlotID,
-			Username:  Username,
-			StartDate: StartDate,
-			EndDate:   EndDate,
-		}
+		jsonBooking := packageBookingJSON("", PlotID, Username, StartDate, EndDate)
 
-		byteBooking, err := json.Marshal(newBooking)
-		if err != nil {
-			fmt.Println(err)
-		}
-		jsonBooking := bytes.NewBuffer(byteBooking)
-
-		response, err := http.Post(baseURL+"booking/all", "application/json", jsonBooking)
+		response, err := http.Post(apiURL+"bookings/booking/all", "application/json", jsonBooking)
 
 		if err == nil {
 			data, err := ioutil.ReadAll(response.Body)
@@ -162,50 +109,27 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	BookingID := req.FormValue("booking")
 	Username := req.FormValue("user")
-	PlotID := req.FormValue("plot")
 
-	var tempLeases bookings
+	// pull bookings for plot
+	currentBooking := callBookingsAPI("byBooking", BookingID)
+	leases := callBookingsAPI("byPlot", currentBooking.Bookings[0].PlotID)
+	currentLeases := onlyCurrentLeases(leases)
 
-	response, err := http.Get(baseURL + "plot/" + PlotID)
-
-	if err == nil {
-		data, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		json.Unmarshal(data, &tempLeases)
-
-		response.Body.Close()
-	} else {
-		fmt.Println(err)
-	}
-
-	var availableLeases bookings
-
-	for _, v := range tempLeases.Bookings {
-		leaseBool, err := strconv.ParseBool(v.LeaseCompleted)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		if leaseBool == false {
-			availableLeases.Bookings = append(availableLeases.Bookings, v)
-		}
-	}
+	// pull plot info
+	plot := callPlotsAPI(currentBooking.Bookings[0].PlotID)
 
 	allInfo := map[string]allInfo{
 		"allInfo": {
 			Username:      Username,
 			Name:          Username,
 			Email:         Username,
-			PlotID:        PlotID,
-			VenueName:     PlotID,
-			Address:       PlotID,
+			PlotID:        plot.PlotID,
+			VenueName:     plot.VenueName,
+			Address:       plot.Address,
 			BookingID:     BookingID,
-			StartDate:     "",
-			EndDate:       "",
-			CurrentLeases: availableLeases,
+			StartDate:     currentBooking.Bookings[0].StartDate,
+			EndDate:       currentBooking.Bookings[0].EndDate,
+			CurrentLeases: currentLeases,
 		},
 	}
 
@@ -214,21 +138,9 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 		StartDate := req.FormValue("StartDate")
 		EndDate := req.FormValue("EndDate")
 
-		editBooking := booking{
-			BookingID: BookingID,
-			PlotID:    PlotID,
-			Username:  Username,
-			StartDate: StartDate,
-			EndDate:   EndDate,
-		}
+		jsonBooking := packageBookingJSON(BookingID, plot.PlotID, Username, StartDate, EndDate)
 
-		byteBooking, err := json.Marshal(editBooking)
-		if err != nil {
-			fmt.Println(err)
-		}
-		jsonBooking := bytes.NewBuffer(byteBooking)
-
-		request, err := http.NewRequest(http.MethodPut, baseURL+"booking/"+BookingID, jsonBooking)
+		request, err := http.NewRequest(http.MethodPut, apiURL+"bookings/booking/"+BookingID, jsonBooking)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -247,8 +159,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 			fmt.Println(string(data))
 
 			if response.StatusCode == 201 {
-				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
-				return
+				http.Redirect(res, req, "/editbooking/?booking="+BookingID, http.StatusSeeOther)
 			} else {
 				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
 				return
@@ -267,12 +178,14 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 func DeleteBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	BookingID := req.FormValue("booking")
-	Username := req.FormValue("user")
-	PlotID := req.FormValue("plot")
 
-	var tempLeases bookings
+	request, err := http.NewRequest(http.MethodDelete, baseURL+"booking/"+BookingID, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	response, err := http.Get(baseURL + "plot/" + PlotID)
+	client := &http.Client{}
+	response, err := client.Do(request)
 
 	if err == nil {
 		data, err := ioutil.ReadAll(response.Body)
@@ -280,74 +193,104 @@ func DeleteBooking(res http.ResponseWriter, req *http.Request) {
 			fmt.Println(err)
 		}
 
-		json.Unmarshal(data, &tempLeases)
+		fmt.Println(string(data))
 
-		response.Body.Close()
+		if response.StatusCode == 202 {
+			http.Redirect(res, req, "/homepage/", http.StatusSeeOther)
+		} else {
+			fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
+			return
+		}
+
 	} else {
 		fmt.Println(err)
 	}
 
-	var availableLeases bookings
+	response.Body.Close()
+}
 
-	for _, v := range tempLeases.Bookings {
+func callBookingsAPI(byCriteria, criteria string) (bookings bookings) {
+	var response *http.Response
+
+	switch byCriteria {
+	case "byPlot":
+		res, err := http.Get(apiURL + "bookings/plot/" + criteria)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			response = res
+		}
+	case "byBooking":
+		res, err := http.Get(apiURL + "bookings/booking/" + criteria)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			response = res
+		}
+	default:
+		fmt.Println("callBookingsAPI function was not used correctly.")
+	}
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	json.Unmarshal(data, &bookings)
+
+	response.Body.Close()
+
+	return bookings
+}
+
+func onlyCurrentLeases(bookings bookings) (currentLeases bookings) {
+	for _, v := range bookings.Bookings {
 		leaseBool, err := strconv.ParseBool(v.LeaseCompleted)
 		if err != nil {
 			fmt.Println(err)
 		}
 
 		if leaseBool == false {
-			availableLeases.Bookings = append(availableLeases.Bookings, v)
+			currentLeases.Bookings = append(currentLeases.Bookings, v)
 		}
 	}
+	return currentLeases
+}
 
-	allInfo := map[string]allInfo{
-		"allInfo": {
-			Username:      Username,
-			Name:          Username,
-			Email:         Username,
-			PlotID:        PlotID,
-			VenueName:     PlotID,
-			Address:       PlotID,
-			BookingID:     BookingID,
-			StartDate:     "",
-			EndDate:       "",
-			CurrentLeases: availableLeases,
-		},
-	}
+func callPlotsAPI(PlotID string) (plot Plot) {
+	response, err := http.Get(apiURL + "plots/" + PlotID)
 
-	// delete booking when form is submitted
-	if req.Method == http.MethodPost {
-
-		request, err := http.NewRequest(http.MethodDelete, baseURL+"booking/"+BookingID, nil)
+	if err == nil {
+		data, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		client := &http.Client{}
-		response, err := client.Do(request)
-
-		if err == nil {
-			data, err := ioutil.ReadAll(response.Body)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			fmt.Println(string(data))
-
-			if response.StatusCode == 202 {
-				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
-				return
-			} else {
-				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
-				return
-			}
-
-		} else {
-			fmt.Println(err)
-		}
+		data = data[3:] // remove method that gets returned in front of JSON object
+		json.Unmarshal(data, &plot)
 
 		response.Body.Close()
+	} else {
+		fmt.Println(err)
 	}
 
-	tpl.ExecuteTemplate(res, "deletebooking.gohtml", allInfo)
+	return plot
+}
+
+func packageBookingJSON(BookingID, PlotID, Username, StartDate, EndDate string) (jsonBooking *bytes.Buffer) {
+	booking := booking{
+		BookingID: BookingID,
+		PlotID:    PlotID,
+		Username:  Username,
+		StartDate: StartDate,
+		EndDate:   EndDate,
+	}
+
+	byteBooking, err := json.Marshal(booking)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	jsonBooking = bytes.NewBuffer(byteBooking)
+	return jsonBooking
 }

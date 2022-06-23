@@ -6,14 +6,25 @@
 </head>
 <body>
 
-<h1>Edit Booking</h1>
-
+<h1>Booking Details</h1>
 <p>Booking ID: {{ .allInfo.BookingID }}</p>
+<p>Start Date: {{ .allInfo.StartDate }}</p>
+<p>End Date: {{ .allInfo.EndDate }}</p>
+<br />
+
+<h2>User Details</h2>
+<p>Username: {{ .allInfo.Username }}</p>
+<p>Name: {{ .allInfo.Name }}</p>
+<p>Email: {{ .allInfo.Email }}</p>
+<br />
+
+<h2>Plot Details</h2>
 <p>Venue: {{ .allInfo.VenueName }}</p>
 <p>Address: {{ .allInfo.Address }}</p>
 <p>Plot ID: {{ .allInfo.PlotID }}</p>
-<p>Current Bookings:</p>
+<br />
 
+<h2>All Current Bookings</h2>
 <table>
     <tr>
         <th>Booking ID</th>
@@ -28,17 +39,19 @@
     </tr>
     {{ end }}
 </table>
+<br />
 
+<h2>Change Booking Dates</h2>
 <form method = "POST">
 
-<p>New Desired Start Date of Lease:</p>
+<p>New Desired Start Date:</p>
 <input
     type="date"
     name="StartDate"
     placeholder="Start Date of Lease"
 />
 
-<p>New Desired End Date of Lease:</p>
+<p>New Desired End Date:</p>
 <input
     type="date"
     name="EndDate"
@@ -51,6 +64,11 @@
 <input type="submit" value="Submit">
 
 </form>
+<br />
+
+<h2>Delete Booking</h2>
+<p>Please note that deleting a booking cannot be reversed.</p>
+<a href="/deletebooking/?booking={{.allInfo.BookingID}}">Delete</a>
 
 </body>
 </html>
