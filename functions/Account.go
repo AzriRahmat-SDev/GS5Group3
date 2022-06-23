@@ -9,6 +9,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type Users struct {
+	Name     string `field:"Name"`
+	Username string `field:"Username"`
+	Email    string `field:"Email"`
+}
+
 type updateUsers struct {
 	Name     string `field:"Name"`
 	Username string `field:"Username"`

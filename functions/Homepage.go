@@ -8,7 +8,6 @@ import (
 
 func Homepage(res http.ResponseWriter, req *http.Request) {
 
-
 	if alreadyLoggedIn(res, req) {
 
 		fmt.Println("hello i am in homepage")
@@ -32,7 +31,7 @@ func Homepage(res http.ResponseWriter, req *http.Request) {
 			}
 			fmt.Println("hello i am get all plots")
 			tpl.ExecuteTemplate(res, "homepage.html", venueArr)
-    }
+		}
 
 	}
 }
