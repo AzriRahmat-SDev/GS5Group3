@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"unicode"
 
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
@@ -52,18 +53,32 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 	} else if req.Method == http.MethodPost {
 
 		name := req.FormValue("name")
-		username := req.FormValue("username")
+		username := req.FormValue("username") //have to add check for unique username
 		password := req.FormValue("password")
 
-		passwordVerification := false
-		if 8 <= len(password) && len(password) < 60 {
+		//password verification
+		var pswdLowercase, pswdUppercase, passwordVerification, pswdNumber, pswdSpecial bool
+		for _, char := range password {
+			if unicode.IsLower(char) {
+				pswdLowercase = true
+			} else if unicode.IsUpper(char) {
+				pswdUppercase = true
+			} else if unicode.IsNumber(char) {
+				pswdNumber = true
+			} else if unicode.IsPunct(char) || unicode.IsSymbol(char) {
+				pswdSpecial = true
+			}
+		}
+		if 8 <= len(password) {
 			passwordVerification = true
 		}
-
-		if passwordVerification == false {
+		if !pswdLowercase || !pswdUppercase || !pswdNumber || !pswdSpecial || !passwordVerification {
 			tpl.ExecuteTemplate(res, "signup.html", "please check username and password criteria")
+			return
 		}
+		//end password verification
 
+		//hashing password for more security incase hackers get our userslist
 		hashPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 7)
 
 		email := req.FormValue("email")
@@ -91,6 +106,14 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 		username := req.FormValue("username")
 		password := req.FormValue("password")
 
+		//Admin Area
+		if username == "Admin" {
+			fmt.Println("Admin user correct")
+			if password == "Admin123!@#" {
+				http.Redirect(res, req, "/allusers", 303)
+				return
+			}
+		}
 		// retrieve password from db to compare (hash) with user supplied password's hash
 		var hash string
 		stmt := "SELECT Password FROM users WHERE Username = ?"
@@ -105,7 +128,7 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 		err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 		// returns nil on succcess
 		if err == nil {
-			fmt.Fprint(res, "You have successfully logged in :)")
+			http.Redirect(res, req, "/homepage/", 303)
 			return
 		}
 
