@@ -1,4 +1,4 @@
-module GitHub/GS5Group3
+module GS5Group3
 
 go 1.18
 

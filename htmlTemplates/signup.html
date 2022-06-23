@@ -7,7 +7,14 @@
   <body>
     <h1>Create New Account</h1>
     <h3>Enter the following to create a new account</h3>
-
+    <h4>
+      Password verification:<br />
+      1. At least 8 characters<br />
+      2. At least 1 lowercase<br />
+      3. At least 1 uppercase<br />
+      4. At least 1 special character<br />
+      5. At least 1 number<br />
+    </h4>
     <form method="post">
       <label for="name">Name:</label>
       <input type="text" name="name" placeholder="name" /><br />
@@ -15,9 +22,7 @@
       <input type="text" name="username" placeholder="username" /><br />
       <label for="password">Password:</label>
       <input type="password" name="password" placeholder="password" /><br />
-      <h4>
-        Password length should be longer than 8 characters to pass verification
-      </h4>
+
       <label for="email">Email:</label>
       <input type="email" name="email" placeholder="email" /><br />
       <input type="submit" />

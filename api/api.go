@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"log"
@@ -7,14 +7,29 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func main() {
+const baseURL = "http://localhost:5000/api/v1/"
+
+func StartServer() {
 
 	//Allocating memory space to map
-	Space = make(map[string]SpaceInfo)
+	plotMap = make(map[string]Plot)
+	//RunTests()
 
 	router := mux.NewRouter()
+
 	router.HandleFunc("/api/v1/plots", GetAllPlots).Methods("GET")
 	router.HandleFunc("/api/v1/plots/{plotid}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 
+	router.HandleFunc("/api/v1/bookings", getHandler).Methods("GET")
+	router.HandleFunc("/api/v1/bookings/booking/{BookingID}", bookingHandler).Methods("GET", "POST", "PUT", "DELETE")
+	router.HandleFunc("/api/v1/bookings/user/{Username}", getHandler).Methods("GET")
+	router.HandleFunc("/api/v1/bookings/plot/{PlotID}", getHandler).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":5000", router))
+
+}
+
+func main() {
+	StartServer()
+
 }

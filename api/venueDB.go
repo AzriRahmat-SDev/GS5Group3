@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"database/sql"
@@ -10,19 +10,16 @@ import (
 
 type Plot struct {
 	PlotID    string `json:"PlotID"`
-	VenueInfo VenueInformation
-}
-type VenueInformation struct {
 	VenueName string `json:"VenueName"`
 	Address   string `json:"Address"`
 }
 
-var plotMap map[string]VenueInformation
+var plotMap map[string]Plot
 
 var PlotList []Plot
 
 func OpenVenueDB() *sql.DB {
-	db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/venue_db")
+	db, err := sql.Open("mysql", "root:password@tcp(localhost:32769)/database")
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -34,7 +31,7 @@ func OpenVenueDB() *sql.DB {
 }
 
 func InsertPlot(db *sql.DB, p Plot) {
-	query := fmt.Sprintf("INSERT INTO plots (PlotID, VenueName, Address) VALUES ('%s', '%s', '%s')", p.PlotID, p.VenueInfo.VenueName, p.VenueInfo.Address)
+	query := fmt.Sprintf("INSERT INTO plots (PlotID, VenueName, Address) VALUES ('%s', '%s', '%s')", p.PlotID, p.VenueName, p.Address)
 	_, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -78,7 +75,7 @@ func nextPlotID(db *sql.DB, venue string) int {
 	return 0
 }
 
-func FillMap(db *sql.DB) {
+func PopulateData(db *sql.DB) {
 	for k := range plotMap {
 		delete(plotMap, k)
 	}
@@ -89,27 +86,19 @@ func FillMap(db *sql.DB) {
 
 	for results.Next() {
 		var p Plot
-		err := results.Scan(&p.PlotID, &p.VenueInfo.VenueName, &p.VenueInfo.Address)
+		err := results.Scan(&p.PlotID, &p.VenueName, &p.Address)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		plotMap[p.PlotID] = p.VenueInfo
+		plotMap[p.PlotID] = p
 	}
-}
-
-func main() {
-
-	plotMap = make(map[string]VenueInformation)
-	RunTests()
 }
 
 func RunTests() {
 	s := Plot{
-		PlotID: "ALJ027",
-		VenueInfo: VenueInformation{
-			VenueName: "Aljunied Park",
-			Address:   "Aljunied Road, Happy Garden Estate, 389842",
-		},
+		PlotID:    "ALJ027",
+		VenueName: "Aljunied Park",
+		Address:   "Aljunied Road, Happy Garden Estate, 389842",
 	}
 
 	InsertPlot(OpenVenueDB(), s)
@@ -118,24 +107,4 @@ func RunTests() {
 	EditPlotVenueName(OpenVenueDB(), "ALJ001", "Aljunieeed")
 	EditPlotVenueName(OpenVenueDB(), "ALJ001", "Aljunied Park")
 	DeletePlot(OpenVenueDB(), "ALJ027")
-	//RefreshPlots()
-}
-
-func RefreshPlots() {
-
-	FillMap(OpenVenueDB())
-
-	for k := range plotMap {
-		p := Plot{
-			PlotID: k,
-			VenueInfo: VenueInformation{
-				VenueName: plotMap[k].VenueName,
-				Address:   plotMap[k].Address,
-			},
-		}
-		PlotList = append(PlotList, p)
-	}
-	for x, y := range PlotList {
-		fmt.Println(x, y)
-	}
 }

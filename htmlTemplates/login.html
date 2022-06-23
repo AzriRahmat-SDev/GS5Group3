@@ -10,15 +10,15 @@
 
 <form action= "/loginauth" method = "POST">
 <label for = "username"> Username : </label><br>
- <input type="text" id="username" name="username"><br>
- <label for = "password"> Password : </label><br>
- <input type="password" id="password" name="password"><br><br>
- <input type="submit" value="Submit">
- <form/>
+<input type="text" id="username" name="username"><br>
+<label for = "password"> Password : </label><br>
+<input type="password" id="password" name="password"><br><br>
+<input type="submit" value="Submit">
+<form/>
 
- <br><br>
+<br><br>
 
- {{if .}}
+{{if .}}
     {{.}}
 
 {{end}}

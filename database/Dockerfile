@@ -1,6 +1,10 @@
+#For windows Users
 FROM mysql
 
-# Add database
+#For mac Users
+#FROM mysql:oracle
+
+# Add database called database
 ENV MYSQL_DATABASE database
 
 # Add the content of the sql-scripts/directory to your image

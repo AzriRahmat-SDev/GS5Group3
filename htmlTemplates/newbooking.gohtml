@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Community Gardens</title>
+</head>
+<body>
+
+<h1>New Booking</h1>
+
+<p>Venue: {{ .allInfo.VenueName }}</p>
+<p>Address: {{ .allInfo.Address }}</p>
+<p>Plot ID: {{ .allInfo.PlotID }}</p>
+<p>Current Bookings:</p>
+
+<table>
+    <tr>
+        <th>Booking ID</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+    </tr>
+    {{ range .allInfo.CurrentLeases.Bookings }}
+    <tr>
+        <td>{{ .BookingID }}</td>
+        <td>{{ .StartDate }}</td>
+        <td>{{ .EndDate }}</td>
+    </tr>
+    {{ end }}
+</table>
+
+<form method = "POST">
+
+<p>Desired Start Date of Lease:</p>
+<input
+    type="date"
+    name="StartDate"
+    placeholder="Start Date of Lease"
+/>
+
+<p>Desired End Date of Lease:</p>
+<input
+    type="date"
+    name="EndDate"
+    placeholder="End Date of Lease"
+/>
+ 
+<br />
+<br />
+
+<input type="submit" value="Submit">
+
+</form>
+
+</body>
+</html>
