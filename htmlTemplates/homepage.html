@@ -21,7 +21,7 @@
 		<div style="font-size: x-large">Viewing Available Plots</div>
 
         {{range .}} PlotID: {{.PlotID}} Venue Name: {{.VenueName}} Address: {{.Address}}<br />
-        <a href="/booking/?PlotID={{.PlotID}}">Book Me!</a>
+        <a href="/newbooking/?plot={{.PlotID}}">Book Me!</a>
         <br />
         {{end}}
 	</body>

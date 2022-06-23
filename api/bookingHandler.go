@@ -1,4 +1,4 @@
-package api
+package main
 
 import (
 	"database/sql"
@@ -16,7 +16,7 @@ import (
 type booking struct {
 	BookingID      string `json:"BookingID"`
 	PlotID         string `json:"PlotID"`
-	UserID         string `json:"UserID"`
+	Username       string `json:"Username"`
 	StartDate      string `json:"StartDate"`
 	EndDate        string `json:"EndDate"`
 	LeaseCompleted string `json:"LeaseCompleted"`
@@ -26,13 +26,13 @@ const connection string = "root:password@tcp(localhost:32769)/database"
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	userParam := params["UserID"]
+	userParam := params["Username"]
 	plotParam := params["PlotID"]
 
 	var query string
 
 	if userParam != "" {
-		query = fmt.Sprintf("SELECT * FROM database.bookings WHERE UserID='%s'", userParam)
+		query = fmt.Sprintf("SELECT * FROM database.bookings WHERE Username='%s'", userParam)
 	} else if plotParam != "" {
 		query = fmt.Sprintf("SELECT * FROM database.bookings WHERE PlotID='%s'", plotParam)
 	} else {
@@ -64,7 +64,7 @@ func getBookings(query string) (bookings map[string][]booking) {
 
 	for results.Next() {
 		var booking booking
-		err = results.Scan(&booking.BookingID, &booking.PlotID, &booking.UserID, &booking.StartDate, &booking.EndDate, &booking.LeaseCompleted)
+		err = results.Scan(&booking.BookingID, &booking.PlotID, &booking.Username, &booking.StartDate, &booking.EndDate, &booking.LeaseCompleted)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -140,7 +140,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 				json.Unmarshal(reqBody, &newBooking)
 
 				// check if all fields have been received
-				if newBooking.PlotID == "" || newBooking.UserID == "" || newBooking.StartDate == "" || newBooking.EndDate == "" {
+				if newBooking.PlotID == "" || newBooking.Username == "" || newBooking.StartDate == "" || newBooking.EndDate == "" {
 					w.WriteHeader(http.StatusUnprocessableEntity)
 					w.Write([]byte("422 - All fields must be filled out and in JSON format"))
 					return
@@ -155,7 +155,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 					}
 					defer db.Close()
 
-					query := fmt.Sprintf("INSERT INTO bookings (PlotID, UserID, StartDate, EndDate, LeaseCompleted) VALUES ('%s', '%s', '%s', '%s', 'false')", newBooking.PlotID, newBooking.UserID, newBooking.StartDate, newBooking.EndDate)
+					query := fmt.Sprintf("INSERT INTO bookings (PlotID, Username, StartDate, EndDate, LeaseCompleted) VALUES ('%s', '%s', '%s', '%s', 'false')", newBooking.PlotID, newBooking.Username, newBooking.StartDate, newBooking.EndDate)
 					_, err = db.Query(query)
 					if err != nil {
 						panic(err.Error())
@@ -184,7 +184,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 				json.Unmarshal(reqBody, &editBooking)
 
 				// check if all fields have been received
-				if editBooking.BookingID == "" || editBooking.PlotID == "" || editBooking.UserID == "" || editBooking.StartDate == "" || editBooking.EndDate == "" {
+				if editBooking.BookingID == "" || editBooking.PlotID == "" || editBooking.Username == "" || editBooking.StartDate == "" || editBooking.EndDate == "" {
 					w.WriteHeader(http.StatusUnprocessableEntity)
 					w.Write([]byte("422 - All fields must be filled out and in JSON format"))
 					return
