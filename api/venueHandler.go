@@ -15,7 +15,7 @@ import (
 func GetAllPlots(w http.ResponseWriter, r *http.Request) {
 	db := OpenVenueDB()
 	defer db.Close()
-	PopulateData(db)
+	populateData(db)
 	json.NewEncoder(w).Encode(plotMap)
 }
 
@@ -27,7 +27,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	if r.Method == "GET" {
-		PopulateData(db)
+		populateData(db)
 		if _, ok := plotMap[params["plotid"]]; ok {
 			fmt.Println("PLOT ID : ", params["plotid"])
 			json.NewEncoder(w).Encode(plotMap[params["plotid"]])
@@ -38,9 +38,9 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "DELETE" {
-		PopulateData(db)
+		populateData(db)
 		if _, ok := plotMap[params["plotid"]]; ok {
-			//DeletePlot(db, params["plotid"])
+			DeletePlot(db, params["plotid"])
 			w.WriteHeader(http.StatusAccepted)
 			w.Write([]byte("202 - Plot deleted: " + params["plotid"]))
 		} else {
@@ -50,7 +50,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("Content-type") == "application/json" {
-		PopulateData(db)
+		populateData(db)
 		if r.Method == "POST" {
 			var newPlot Plot
 			reqBody, err := ioutil.ReadAll(r.Body)
@@ -79,7 +79,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		//PUT request here
 		if r.Method == "PUT" {
-			PopulateData(db)
+			populateData(db)
 			var newPlot Plot
 			reqBody, err := ioutil.ReadAll(r.Body)
 

@@ -15,17 +15,23 @@ type Plot struct {
 }
 
 var plotMap map[string]Plot
+var plotList []Plot
 
-var PlotList []Plot
+// Venue Name + Address
+var venueMap map[string]string
+
+type VenueInformation struct {
+	VenueName string
+	Address   string
+}
+
+var VenueInformationList []VenueInformation
 
 func OpenVenueDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:password@tcp(localhost:32769)/database")
+	db, err := sql.Open("mysql", connection)
 
 	if err != nil {
 		log.Fatal(err.Error())
-	} else {
-		fmt.Print("Connected")
-		// log open
 	}
 	return db
 }
@@ -75,7 +81,7 @@ func nextPlotID(db *sql.DB, venue string) int {
 	return 0
 }
 
-func PopulateData(db *sql.DB) {
+func populateData(db *sql.DB) {
 	for k := range plotMap {
 		delete(plotMap, k)
 	}
@@ -91,5 +97,20 @@ func PopulateData(db *sql.DB) {
 			fmt.Println(err.Error())
 		}
 		plotMap[p.PlotID] = p
+		plotList = append(plotList, p)
+		if _, ok := venueMap[p.VenueName]; !ok {
+			venueMap[p.VenueName] = p.Address
+		}
 	}
+	// exposing for template usage
+	for v, k := range venueMap {
+		vi := &VenueInformation{VenueName: v, Address: k}
+		VenueInformationList = append(VenueInformationList, *vi)
+	}
+	sortVenueInfoList(VenueInformationList, 0, len(VenueInformationList)-1)
+
+}
+
+func GetVenueInformationList() []VenueInformation {
+	return VenueInformationList
 }
