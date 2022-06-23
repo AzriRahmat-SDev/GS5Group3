@@ -1,20 +1,12 @@
 package functions
 
 import (
-	"database/sql"
 	"fmt"
-	"html/template"
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type Users struct {
-	Name     string `field:"Name"`
-	Username string `field:"Username"`
-	Email    string `field:"Email"`
-}
 
 type updateUsers struct {
 	Name     string `field:"Name"`
@@ -23,6 +15,7 @@ type updateUsers struct {
 	Email    string `field:"Email"`
 }
 
+<<<<<<< Updated upstream
 var db *sql.DB
 var tpl *template.Template
 
@@ -40,6 +33,8 @@ func connectUserDB() *sql.DB {
 	return db
 }
 
+=======
+>>>>>>> Stashed changes
 func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	db := connectUserDB()
@@ -103,7 +98,18 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 		err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 		// returns nil on succcess
 		if err == nil {
+<<<<<<< Updated upstream
 			fmt.Fprint(res, "You have successfully logged in :)")
+=======
+			myCookie := &http.Cookie{
+				Name:   "myCookie",
+				Value:  username,
+				MaxAge: 3600,
+			}
+			http.SetCookie(res, myCookie)
+			http.Redirect(res, req, "/homepage/", 303)
+
+>>>>>>> Stashed changes
 			return
 		}
 
@@ -111,6 +117,7 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+<<<<<<< Updated upstream
 func AllUsers(res http.ResponseWriter, req *http.Request) {
 	db := connectUserDB()
 	defer db.Close()
@@ -157,6 +164,8 @@ func DeleteRecord(res http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(res, "result.html", "User was Successfully Deleted")
 }
 
+=======
+>>>>>>> Stashed changes
 func Update(res http.ResponseWriter, req *http.Request) {
 	db := connectUserDB()
 	defer db.Close()
