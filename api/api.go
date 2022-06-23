@@ -9,7 +9,7 @@ import (
 
 const baseURL = "http://localhost:5000/api/v1/"
 
-func startServer() {
+func StartServer() {
 
 	//Allocating memory space to map
 	plotMap = make(map[string]Plot)
@@ -30,6 +30,6 @@ func startServer() {
 }
 
 func main() {
-	startServer()
+	StartServer()
 
 }

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"GS5Group3/api"
 	"GS5Group3/functions"
+	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"text/template"
 
 	"github.com/gorilla/mux"
@@ -16,6 +19,9 @@ func init() {
 }
 
 func main() {
+	wg := new(sync.WaitGroup)
+	wg.Add(2)
+
 	r := mux.NewRouter()
 	//viewing page. Has the option to go into adminlogin
 	//r.HandleFunc("/", functions.IndexPage)
@@ -42,5 +48,17 @@ func main() {
 	// r.HandleFunc("/adminlogin", functions.AdminLogin)
 	// r.HandleFunc("/adminarea", functions.AdminArea)
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	go func() {
+		fmt.Println("Starting API for venue and booking...")
+		api.StartServer()
+		wg.Done()
+	}()
+
+	go func() {
+		fmt.Println("Starting server for users...")
+		log.Fatal(http.ListenAndServe(":8080", r))
+		wg.Done()
+	}()
+
+	wg.Wait()
 }
