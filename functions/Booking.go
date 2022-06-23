@@ -89,9 +89,9 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 			fmt.Println(string(data))
 
 			if response.StatusCode == 201 {
-				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
+				http.Redirect(res, req, "/homepage/", http.StatusSeeOther)
 			} else {
-				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
+				fmt.Fprintf(res, string(data))
 				return
 			}
 
@@ -112,6 +112,11 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 
 	// pull bookings for plot
 	currentBooking := callBookingsAPI("byBooking", BookingID)
+	if len(currentBooking.Bookings) == 0 {
+		fmt.Fprintf(res, "Booking does not exist.")
+		return
+	}
+
 	leases := callBookingsAPI("byPlot", currentBooking.Bookings[0].PlotID)
 	currentLeases := onlyCurrentLeases(leases)
 
@@ -161,7 +166,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 			if response.StatusCode == 201 {
 				http.Redirect(res, req, "/editbooking/?booking="+BookingID, http.StatusSeeOther)
 			} else {
-				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
+				fmt.Fprintf(res, string(data))
 				return
 			}
 

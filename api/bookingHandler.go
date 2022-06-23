@@ -147,7 +147,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				// check if plot is available on desired dates
-				if plotAvailable(newBooking.PlotID, newBooking.StartDate, newBooking.EndDate) {
+				if startDateIsBeforeEndDate(newBooking.StartDate, newBooking.EndDate) && plotAvailable(newBooking.PlotID, newBooking.StartDate, newBooking.EndDate) {
 					// establish connection to database
 					db, err := sql.Open("mysql", connection)
 					if err != nil {
@@ -165,7 +165,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("201 - Booking added on plot " + newBooking.PlotID))
 				} else {
 					w.WriteHeader(http.StatusUnprocessableEntity)
-					w.Write([]byte("422 - Desired dates are not available"))
+					w.Write([]byte("422 - Desired dates are not available or start date is not before end date"))
 				}
 
 			} else {
@@ -191,7 +191,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				// check if plot is available for new dates
-				if plotAvailable(editBooking.PlotID, editBooking.StartDate, editBooking.EndDate) {
+				if startDateIsBeforeEndDate(editBooking.StartDate, editBooking.EndDate) && plotAvailable(editBooking.PlotID, editBooking.StartDate, editBooking.EndDate) {
 					// establish connection to database
 					db, err := sql.Open("mysql", connection)
 					if err != nil {
@@ -209,7 +209,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("201 - Booking dates updated for plot " + editBooking.PlotID))
 				} else {
 					w.WriteHeader(http.StatusUnprocessableEntity)
-					w.Write([]byte("422 - Desired dates are not available"))
+					w.Write([]byte("422 - Desired dates are not available or start date is not before end date"))
 				}
 
 			} else {
@@ -243,7 +243,7 @@ func bookingExists(booking string) (exists bool) {
 	return exists
 }
 
-func plotAvailable(plotID string, startDate string, endDate string) (available bool) {
+func plotAvailable(plotID, startDate, endDate string) (available bool) {
 	startDateDate, err := time.Parse("2006-01-02", startDate)
 	if err != nil {
 		fmt.Println(err)
@@ -279,4 +279,21 @@ func plotAvailable(plotID string, startDate string, endDate string) (available b
 	}
 
 	return available
+}
+
+func startDateIsBeforeEndDate(startDate, endDate string) bool {
+	startDateDate, err := time.Parse("2006-01-02", startDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+	endDateDate, err := time.Parse("2006-01-02", endDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if startDateDate.Before(endDateDate) {
+		return true
+	} else {
+		return false
+	}
 }
