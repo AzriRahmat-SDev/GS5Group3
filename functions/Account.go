@@ -1,9 +1,7 @@
 package functions
 
 import (
-	"database/sql"
 	"fmt"
-	"html/template"
 	"net/http"
 	"unicode"
 
@@ -11,36 +9,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Users struct {
-	Name     string `field:"Name"`
-	Username string `field:"Username"`
-	Email    string `field:"Email"`
-}
-
 type updateUsers struct {
 	Name     string `field:"Name"`
 	Username string `field:"Username"`
 	Password []byte `field:"Password"`
 	Email    string `field:"Email"`
-}
-
-var db *sql.DB
-var tpl *template.Template
-
-func init() {
-
-	tpl = template.Must(template.ParseGlob("htmlTemplates/*"))
-
-}
-func connectUserDB() *sql.DB {
-	var err error
-	db, err = sql.Open("mysql", "root:password@tcp(localhost:32769)/database")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	fmt.Println("connected to user db")
-	return db
 }
 
 func SignUp(res http.ResponseWriter, req *http.Request) {
@@ -129,58 +102,18 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 		err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 		// returns nil on succcess
 		if err == nil {
+			myCookie := &http.Cookie{
+				Name:   "myCookie",
+				Value:  username,
+				MaxAge: 3600,
+			}
+			http.SetCookie(res, myCookie)
 			http.Redirect(res, req, "/homepage/", 303)
 			return
 		}
 
 		tpl.ExecuteTemplate(res, "login.html", "check username and password")
 	}
-}
-
-func AllUsers(res http.ResponseWriter, req *http.Request) {
-	db := connectUserDB()
-	defer db.Close()
-	fmt.Println("*****AllUsesHandler running*****")
-	if req.Method == http.MethodGet {
-		results, err := db.Query("SELECT Name, Username, Email FROM users")
-		defer results.Close()
-		if err != nil {
-			panic("Error in Allusers Query")
-		}
-
-		var userArr []Users
-
-		for results.Next() {
-			var user Users
-			err := results.Scan(&user.Name, &user.Username, &user.Email)
-			if err != nil {
-				panic("Error in scan")
-			}
-
-			userArr = append(userArr, user)
-		}
-
-		tpl.ExecuteTemplate(res, "allusers.html", userArr)
-
-	}
-
-}
-
-func DeleteRecord(res http.ResponseWriter, req *http.Request) {
-	db := connectUserDB()
-	defer db.Close()
-	fmt.Println("*****deleteHandler running*****")
-	req.ParseForm()
-	username := req.FormValue("username")
-
-	stmt := fmt.Sprintf("DELETE FROM users WHERE (`Username` = '%v')", username)
-	result, err := db.Query(stmt)
-	defer result.Close()
-	if err != nil {
-		panic(err)
-	}
-
-	tpl.ExecuteTemplate(res, "result.html", "User was Successfully Deleted")
 }
 
 func Update(res http.ResponseWriter, req *http.Request) {
