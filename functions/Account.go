@@ -87,9 +87,13 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 
 		//Admin Area
 		if username == "Admin" {
-			fmt.Println("Admin user correct")
 			if password == "Admin123!@#" {
-				//tpl.ExecuteTemplate(res, "restricted.html", "You dont belong here")
+				myCookieAdmin := &http.Cookie{
+					Name:   "myCookieAdmin",
+					Value:  username,
+					MaxAge: 3600,
+				}
+				http.SetCookie(res, myCookieAdmin)
 				http.Redirect(res, req, "/allusers", 303)
 				return
 			}

@@ -20,6 +20,20 @@
 	<br>
 		<div style="font-size: x-large">Viewing Available Plots</div>
 
+        <div>
+			<nav>
+				<div>
+					<ul>
+						<li>
+							<a href="/homepage/"><strong>Home</strong></a>
+						</li>
+						<li>
+							<a href="/logout"><strong>logout</strong></a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</div>
         {{range .}} PlotID: {{.PlotID}} Venue Name: {{.VenueName}} Address: {{.Address}}<br />
         <a href="/newbooking/?plot={{.PlotID}}">Book Me!</a>
         <br />

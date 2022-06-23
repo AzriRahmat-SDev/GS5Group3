@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      a:link {
-        font: bold 11px Arial;
-        text-decoration: none;
-        background-color: #eeeeee;
-        color: #333333;
-        padding: 2px 6px 2px 6px;
-        border-top: 1px solid #cccccc;
-        border-right: 1px solid #333333;
-        border-bottom: 1px solid #333333;
-        border-left: 1px solid #cccccc;
-      }
-    </style>
-  </head>
-  <body>
-    <div style="font-size: x-large">All Users</div>
+	<head>
+		<style>
+			a:link {
+				font: bold 11px Arial;
+				text-decoration: none;
+				background-color: #eeeeee;
+				color: #333333;
+				padding: 2px 6px 2px 6px;
+				border-top: 1px solid #cccccc;
+				border-right: 1px solid #333333;
+				border-bottom: 1px solid #333333;
+				border-left: 1px solid #cccccc;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="font-size: x-large">All Users</div>
+		<div>
+			<nav>
+				<div>
+					<ul>
+						<li>
+							<a href="/logoutAdmin"><strong>logout</strong></a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</div>
 
-    {{range .}} Name: {{.Name}} Username: {{.Username}}<br />
-    Email: {{.Email}}<br />
-    <a href="/delete/?username={{.Username}}">Delete</a>
-    <a href="/update/?username={{.Username}}">Update</a>
-    <br /><br />
-    {{end}}
-  </body>
+		{{range .}} Name: {{.Name}} Username: {{.Username}}<br />
+		Email: {{.Email}}<br />
+		<a href="/delete/?username={{.Username}}">Delete</a>
+		<a href="/update/?username={{.Username}}">Update</a>
+		<br /><br />
+		{{end}}
+	</body>
 </html>
