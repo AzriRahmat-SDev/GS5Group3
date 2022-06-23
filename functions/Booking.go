@@ -25,7 +25,7 @@ type allInfo struct {
 type booking struct {
 	BookingID      string `json:"BookingID"`
 	PlotID         string `json:"PlotID"`
-	UserID         string `json:"UserID"`
+	Username       string `json:"Username"`
 	StartDate      string `json:"StartDate"`
 	EndDate        string `json:"EndDate"`
 	LeaseCompleted string `json:"LeaseCompleted"`
@@ -35,13 +35,21 @@ type bookings struct {
 	Bookings []booking
 }
 
+type Plot struct {
+	PlotID    string `json:"PlotID"`
+	VenueName string `json:"VenueName"`
+	Address   string `json:"Address"`
+}
+
 const baseURL string = "http://localhost:5000/api/v1/bookings/"
+const plotsAPI string = "http://localhost:5000/api/v1/plots/"
 
 func NewBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	Username := req.FormValue("user")
 	PlotID := req.FormValue("plot")
 
+	// pull bookings for plot
 	var tempLeases bookings
 
 	response, err := http.Get(baseURL + "plot/" + PlotID)
@@ -72,14 +80,33 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 
+	// pull plot info
+	var plot Plot
+
+	response, err = http.Get(plotsAPI + PlotID)
+
+	if err == nil {
+		data, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		data = data[3:] // remove method that gets returned in front of JSON object
+		json.Unmarshal(data, &plot)
+
+		response.Body.Close()
+	} else {
+		fmt.Println(err)
+	}
+
 	allInfo := map[string]allInfo{
 		"allInfo": {
 			Username:      Username,
 			Name:          Username,
 			Email:         Username,
-			PlotID:        PlotID,
-			VenueName:     PlotID,
-			Address:       PlotID,
+			PlotID:        plot.PlotID,
+			VenueName:     plot.VenueName,
+			Address:       plot.Address,
 			StartDate:     "",
 			EndDate:       "",
 			CurrentLeases: availableLeases,
@@ -93,7 +120,7 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 
 		newBooking := booking{
 			PlotID:    PlotID,
-			UserID:    Username,
+			Username:  Username,
 			StartDate: StartDate,
 			EndDate:   EndDate,
 		}
@@ -116,7 +143,6 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 
 			if response.StatusCode == 201 {
 				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
-				return
 			} else {
 				fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
 				return
@@ -191,7 +217,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 		editBooking := booking{
 			BookingID: BookingID,
 			PlotID:    PlotID,
-			UserID:    Username,
+			Username:  Username,
 			StartDate: StartDate,
 			EndDate:   EndDate,
 		}

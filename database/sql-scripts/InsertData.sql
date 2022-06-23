@@ -1,7 +1,7 @@
-INSERT INTO bookings (PlotID, UserID, StartDate, EndDate, LeaseCompleted) VALUES ('000001', '000001', '2022-04-23', '2022-05-23', 'true');
-INSERT INTO bookings (PlotID, UserID, StartDate, EndDate, LeaseCompleted) VALUES ('000002', '000002', '2022-03-09', '2022-04-09', 'true');
-INSERT INTO bookings (PlotID, UserID, StartDate, EndDate, LeaseCompleted) VALUES ('000003', '000003', '2022-04-20', '2022-05-20', 'false');
-INSERT INTO bookings (PlotID, UserID, StartDate, EndDate, LeaseCompleted) VALUES ('000004', '000004', '2022-04-22', '2022-05-22', 'false');
+INSERT INTO bookings (PlotID, Username, StartDate, EndDate, LeaseCompleted) VALUES ('ALJ001', 'victor', '2022-04-23', '2022-05-23', 'true');
+INSERT INTO bookings (PlotID, Username, StartDate, EndDate, LeaseCompleted) VALUES ('ALJ001', 'victor', '2022-05-24', '2022-07-01', 'false');
+INSERT INTO bookings (PlotID, Username, StartDate, EndDate, LeaseCompleted) VALUES ('AMK001', 'victor', '2022-04-20', '2022-05-20', 'true');
+INSERT INTO bookings (PlotID, Username, StartDate, EndDate, LeaseCompleted) VALUES ('AMK001', 'victor', '2022-06-22', '2022-07-22', 'false');
 
 INSERT INTO
     users (Name, Username, Password, Email)
@@ -11,6 +11,16 @@ VALUES
         'Admin',
         'AdminPassword',
         'Admin@gmail.com'
+    );
+
+INSERT INTO
+    users (Name, Username, Password, Email)
+VALUES
+    (
+        'Victor',
+        'victor',
+        '$2a$07$4v7oqn3juKAAvUlXaXevru.RiP5lOA1rIreQruFywrULleD9czm5C',
+        'victor@gmail.com'
     );
 
 INSERT INTO
