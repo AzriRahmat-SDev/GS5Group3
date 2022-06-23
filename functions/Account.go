@@ -30,6 +30,12 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		password := req.FormValue("password")
 
 		//password verification
+		cfmpassword := req.FormValue("cfmpassword")
+		if cfmpassword != password {
+			tpl.ExecuteTemplate(res, "signup.html", "password did not match!")
+			return
+		}
+
 		var pswdLowercase, pswdUppercase, passwordVerification, pswdNumber, pswdSpecial bool
 		for _, char := range password {
 			if unicode.IsLower(char) {
