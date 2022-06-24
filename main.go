@@ -36,6 +36,8 @@ func main() {
 	r.HandleFunc("/update/", functions.Update)             //both admin and users
 	r.HandleFunc("/updateresult/", functions.UpdateResult) //both admin and users
 	r.HandleFunc("/homepage/", functions.Homepage)         //only users
+	r.HandleFunc("/venues/", functions.ViewVenues)
+	r.HandleFunc("/venues/viewvenueplots/", functions.ViewVenuePlots)
 	// r.HandleFunc("/accountmanagement", functions.AccountManagement)
 	// r.HandleFunc("/bookings", functions.Bookings) // Holds both current and booking history
 	r.HandleFunc("/newbooking/", functions.NewBooking)

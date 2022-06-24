@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <body>
+  <h1>Click on a Venue to make a Booking</h1>
+  {{range .}}
+    <h2><a href="/venues/viewvenueplots/?VenueName={{.VenueName}}">{{.VenueName}}</a></h2>
+    {{.Address}}
+    <br>
+    {{end}}
+  </body>
+</html>

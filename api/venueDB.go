@@ -17,15 +17,11 @@ type Plot struct {
 var plotMap map[string]Plot
 var plotList []Plot
 
-// Venue Name + Address
+/* Venue Name + Address
+ */
 var venueMap map[string]string
 
-type VenueInformation struct {
-	VenueName string
-	Address   string
-}
-
-var VenueInformationList []VenueInformation
+var initialized bool = false
 
 func OpenVenueDB() *sql.DB {
 	db, err := sql.Open("mysql", connection)
@@ -103,14 +99,13 @@ func populateData(db *sql.DB) {
 		}
 	}
 	// exposing for template usage
-	for v, k := range venueMap {
-		vi := &VenueInformation{VenueName: v, Address: k}
-		VenueInformationList = append(VenueInformationList, *vi)
-	}
-	sortVenueInfoList(VenueInformationList, 0, len(VenueInformationList)-1)
-
+	// for v, k := range venueMap {
+	// 	vi := &VenueInformation{VenueName: v, Address: k}
+	// 	VenueInformationList = append(VenueInformationList, *vi)
+	// }
+	// sortVenueInfoList(VenueInformationList, 0, len(VenueInformationList)-1)
 }
 
-func GetVenueInformationList() []VenueInformation {
-	return VenueInformationList
-}
+// func GetVenueInformationList() []VenueInformation {
+// 	return VenueInformationList
+// }

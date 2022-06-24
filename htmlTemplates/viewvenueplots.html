@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <body>
+  <h1> Choose a Plot ID </h1>
+  {{range .}}
+  <h2>{{.VenueName}}<h2>>
+  <a href="/newbooking/?plot={{.PlotID}}">{{.PlotID}}</a></p>
+    <br>
+  {{end}}
+  </body>
+</html>

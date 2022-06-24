@@ -11,12 +11,44 @@ import (
 )
 
 //Declaring Map Existence globally
-
 func GetAllPlots(w http.ResponseWriter, r *http.Request) {
 	db := OpenVenueDB()
 	defer db.Close()
 	populateData(db)
 	json.NewEncoder(w).Encode(plotMap)
+}
+
+func venueHandler(w http.ResponseWriter, r *http.Request) {
+	db := OpenVenueDB()
+	defer db.Close()
+	if !initialized {
+		populateData(db)
+		initialized = true
+	}
+
+	json.NewEncoder(w).Encode(venueMap)
+
+}
+
+func viewVenuePlots(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+	if !initialized {
+		db := OpenVenueDB()
+		defer db.Close()
+		populateData(db)
+		initialized = true
+	}
+
+	if _, ok := venueMap[params["VenueName"]]; ok {
+		var plotIDs []string
+		for v, k := range plotMap {
+			if k.VenueName == params["VenueName"] {
+				plotIDs = append(plotIDs, v)
+			}
+		}
+		json.NewEncoder(w).Encode(plotIDs)
+	}
 }
 
 func PlotHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,9 +57,12 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	params := mux.Vars(r)
+	if !initialized {
+		populateData(db)
+		initialized = true
+	}
 
 	if r.Method == "GET" {
-		populateData(db)
 		if _, ok := plotMap[params["plotid"]]; ok {
 			fmt.Println("PLOT ID : ", params["plotid"])
 			json.NewEncoder(w).Encode(plotMap[params["plotid"]])
@@ -38,11 +73,11 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "DELETE" {
-		populateData(db)
 		if _, ok := plotMap[params["plotid"]]; ok {
 			DeletePlot(db, params["plotid"])
 			w.WriteHeader(http.StatusAccepted)
 			w.Write([]byte("202 - Plot deleted: " + params["plotid"]))
+			populateData(db)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("404 - No Plot found"))
@@ -50,7 +85,6 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("Content-type") == "application/json" {
-		populateData(db)
 		if r.Method == "POST" {
 			var newPlot Plot
 			reqBody, err := ioutil.ReadAll(r.Body)
@@ -79,7 +113,6 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		//PUT request here
 		if r.Method == "PUT" {
-			populateData(db)
 			var newPlot Plot
 			reqBody, err := ioutil.ReadAll(r.Body)
 
