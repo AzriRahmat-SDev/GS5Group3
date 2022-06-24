@@ -2,16 +2,12 @@ package functions
 
 import (
 	"GS5Group3/api"
-	"fmt"
 	"net/http"
 )
 
 func Homepage(res http.ResponseWriter, req *http.Request) {
 
-
 	if alreadyLoggedIn(res, req) {
-
-		fmt.Println("hello i am in homepage")
 		if req.Method == http.MethodGet {
 			db := api.OpenVenueDB()
 			defer db.Close()
@@ -30,9 +26,8 @@ func Homepage(res http.ResponseWriter, req *http.Request) {
 				}
 				venueArr = append(venueArr, venue)
 			}
-			fmt.Println("hello i am get all plots")
 			tpl.ExecuteTemplate(res, "homepage.html", venueArr)
-    }
+		}
 
 	}
 }
