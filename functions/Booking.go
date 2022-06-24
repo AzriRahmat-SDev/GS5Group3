@@ -2,11 +2,14 @@ package functions
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type allInfo struct {
@@ -42,13 +45,19 @@ type Plot struct {
 }
 
 const apiURL string = "http://localhost:5001/api/v1/"
-const baseURL string = "http://localhost:5001/api/v1/bookings/"
-const plotsAPI string = "http://localhost:5001/api/v1/plots/"
+const connection string = "root:password@tcp(localhost:32769)/database"
 
 func NewBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
-	Username := req.FormValue("user")
 	PlotID := req.FormValue("plot")
+
+	// pull user info
+	cookie, err := req.Cookie("myCookie")
+	if err != nil {
+		http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
+		return
+	}
+	user := getUser(cookie)
 
 	// pull bookings for plot
 	leases := callBookingsAPI("byPlot", PlotID)
@@ -59,9 +68,9 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 
 	allInfo := map[string]allInfo{
 		"allInfo": {
-			Username:      Username,
-			Name:          Username,
-			Email:         Username,
+			Username:      user.Username,
+			Name:          user.Name,
+			Email:         user.Email,
 			PlotID:        plot.PlotID,
 			VenueName:     plot.VenueName,
 			Address:       plot.Address,
@@ -76,7 +85,7 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 		StartDate := req.FormValue("StartDate")
 		EndDate := req.FormValue("EndDate")
 
-		jsonBooking := packageBookingJSON("", PlotID, Username, StartDate, EndDate)
+		jsonBooking := packageBookingJSON("", PlotID, user.Username, StartDate, EndDate)
 
 		response, err := http.Post(apiURL+"bookings/booking/all", "application/json", jsonBooking)
 
@@ -108,7 +117,14 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 func EditBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	BookingID := req.FormValue("booking")
-	Username := req.FormValue("user")
+
+	// pull user info
+	cookie, err := req.Cookie("myCookie")
+	if err != nil {
+		http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
+		return
+	}
+	user := getUser(cookie)
 
 	// pull bookings for plot
 	currentBooking := callBookingsAPI("byBooking", BookingID)
@@ -125,9 +141,9 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 
 	allInfo := map[string]allInfo{
 		"allInfo": {
-			Username:      Username,
-			Name:          Username,
-			Email:         Username,
+			Username:      user.Username,
+			Name:          user.Name,
+			Email:         user.Email,
 			PlotID:        plot.PlotID,
 			VenueName:     plot.VenueName,
 			Address:       plot.Address,
@@ -143,7 +159,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 		StartDate := req.FormValue("StartDate")
 		EndDate := req.FormValue("EndDate")
 
-		jsonBooking := packageBookingJSON(BookingID, plot.PlotID, Username, StartDate, EndDate)
+		jsonBooking := packageBookingJSON(BookingID, plot.PlotID, user.Username, StartDate, EndDate)
 
 		request, err := http.NewRequest(http.MethodPut, apiURL+"bookings/booking/"+BookingID, jsonBooking)
 		if err != nil {
@@ -184,7 +200,7 @@ func DeleteBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	BookingID := req.FormValue("booking")
 
-	request, err := http.NewRequest(http.MethodDelete, baseURL+"booking/"+BookingID, nil)
+	request, err := http.NewRequest(http.MethodDelete, apiURL+"bookings/booking/"+BookingID, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -297,4 +313,23 @@ func packageBookingJSON(BookingID, PlotID, Username, StartDate, EndDate string) 
 
 	jsonBooking = bytes.NewBuffer(byteBooking)
 	return jsonBooking
+}
+
+func getUser(cookie *http.Cookie) (user updateUsers) {
+	db, err := sql.Open("mysql", connection)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
+	query := fmt.Sprintf("SELECT * FROM database.users WHERE Username='%s'", cookie.Value)
+	row := db.QueryRow(query)
+
+	err = row.Scan(&user.Name, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		fmt.Println(err, "Scan error")
+		return
+	}
+
+	return user
 }
