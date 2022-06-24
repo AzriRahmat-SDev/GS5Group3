@@ -14,6 +14,9 @@
                     <a href="/homepage/"><strong>Home</strong></a>
                 </li>
                 <li>
+                    <a href="/user/"><strong>Logout</strong></a>
+                </li>
+                <li>
                     <a href="/logout"><strong>Logout</strong></a>
                 </li>
             </ul>
@@ -81,7 +84,9 @@
 
 <h2>Delete Booking</h2>
 <p>Please note that deleting a booking cannot be reversed.</p>
-<a href="/deletebooking/?booking={{.allInfo.BookingID}}">Delete</a>
+<form action="/deletebooking/?booking={{.allInfo.BookingID}}">
+    <input type="submit" value="Delete" />
+</form>
 
 </body>
 </html>

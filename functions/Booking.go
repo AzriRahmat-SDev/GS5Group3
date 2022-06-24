@@ -24,6 +24,7 @@ type allInfo struct {
 	StartDate     string
 	EndDate       string
 	CurrentLeases bookings
+	ExpiredLeases bookings
 }
 
 type booking struct {
@@ -58,28 +59,28 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 	// pull user info
 	var user updateUsers
 	go func() {
+		defer wg.Done()
 		cookie, err := req.Cookie("myCookie")
 		if err != nil {
 			http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
 			return
 		}
 		user = getUser(cookie)
-		wg.Done()
 	}()
 
 	// pull bookings for plot
 	var currentLeases bookings
 	go func() {
+		defer wg.Done()
 		leases := callBookingsAPI("byPlot", PlotID)
 		currentLeases = onlyCurrentLeases(leases)
-		wg.Done()
 	}()
 
 	// pull plot info
 	var plot Plot
 	go func() {
+		defer wg.Done()
 		plot = callPlotsAPI(PlotID)
-		wg.Done()
 	}()
 
 	wg.Wait()
@@ -137,39 +138,34 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 	BookingID := req.FormValue("booking")
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(1)
 
 	// pull user info
 	var user updateUsers
 	go func() {
+		defer wg.Done()
+
 		cookie, err := req.Cookie("myCookie")
 		if err != nil {
 			http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
 			return
 		}
 		user = getUser(cookie)
-		wg.Done()
+
 	}()
 
-	// pull bookings for plot and plot info
-	var currentBooking, currentLeases bookings
-	var plot Plot
-	go func() {
-		// pull bookings for plot
-		currentBooking := callBookingsAPI("byBooking", BookingID)
-		if len(currentBooking.Bookings) == 0 {
-			fmt.Fprintf(res, "Booking does not exist.")
-			return
-		}
+	// pull bookings for plot
+	currentBooking := callBookingsAPI("byBooking", BookingID)
+	if len(currentBooking.Bookings) == 0 {
+		fmt.Fprintf(res, "Booking does not exist.")
+		return
+	}
 
-		leases := callBookingsAPI("byPlot", currentBooking.Bookings[0].PlotID)
-		currentLeases = onlyCurrentLeases(leases)
+	leases := callBookingsAPI("byPlot", currentBooking.Bookings[0].PlotID)
+	currentLeases := onlyCurrentLeases(leases)
 
-		// pull plot info
-		plot = callPlotsAPI(currentBooking.Bookings[0].PlotID)
-
-		wg.Done()
-	}()
+	// pull plot info
+	plot := callPlotsAPI(currentBooking.Bookings[0].PlotID)
 
 	wg.Wait()
 
@@ -277,6 +273,13 @@ func callBookingsAPI(byCriteria, criteria string) (bookings bookings) {
 		}
 	case "byBooking":
 		res, err := http.Get(apiURL + "bookings/booking/" + criteria)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			response = res
+		}
+	case "byUser":
+		res, err := http.Get(apiURL + "bookings/user/" + criteria)
 		if err != nil {
 			fmt.Println(err)
 		} else {

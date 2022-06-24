@@ -47,7 +47,7 @@ func main() {
 	r.HandleFunc("/logoutAdmin", functions.LogoutAdmin)
 
 	// //User Area functions
-	// r.HandleFunc("/bookspace", functions.BookSpace)
+	r.HandleFunc("/user/", functions.UserArea)
 
 	// //Admin Area
 	// r.HandleFunc("/adminlogin", functions.AdminLogin)
