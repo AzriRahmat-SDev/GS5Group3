@@ -13,11 +13,12 @@ func StartServer() {
 
 	//Allocating memory space to map
 	plotMap = make(map[string]Plot)
+	venueMap = make(map[string]string)
 	//RunTests()
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/v1/plots", GetAllPlots).Methods("GET")
+	router.HandleFunc("/api/v1/plots/", GetAllPlots).Methods("GET")
 	router.HandleFunc("/api/v1/plots/{plotid}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 
 	router.HandleFunc("/api/v1/bookings", getHandler).Methods("GET")
@@ -26,10 +27,5 @@ func StartServer() {
 	router.HandleFunc("/api/v1/bookings/plot/{PlotID}", getHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":5001", router))
-
-}
-
-func main() {
-	StartServer()
 
 }
