@@ -325,7 +325,7 @@ func getUser(cookie *http.Cookie) (user updateUsers) {
 	query := fmt.Sprintf("SELECT * FROM database.users WHERE Username='%s'", cookie.Value)
 	row := db.QueryRow(query)
 
-	err = row.Scan(&user.Name, &user.Username, &user.Email, &user.Password)
+	err = row.Scan(&user.Name, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		fmt.Println(err, "Scan error")
 		return
