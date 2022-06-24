@@ -118,7 +118,7 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 				MaxAge: 3600,
 			}
 			http.SetCookie(res, myCookie)
-			http.Redirect(res, req, "/homepage/", 303)
+			http.Redirect(res, req, "/venues/", 303)
 			return
 		}
 

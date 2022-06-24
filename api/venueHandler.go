@@ -52,7 +52,6 @@ func viewVenuePlots(w http.ResponseWriter, r *http.Request) {
 }
 
 func PlotHandler(w http.ResponseWriter, r *http.Request) {
-
 	db := OpenVenueDB()
 	defer db.Close()
 

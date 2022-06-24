@@ -18,6 +18,9 @@ func StartServer() {
 
 	router := mux.NewRouter()
 
+	router.HandleFunc("api/v1/users", GetAllUsers).Methods("GET")
+	// router.HandleFunc("api/v1/users/{username}", Userhandler).Methods("GET", "POST", "PUT", "DELETE")
+
 	router.HandleFunc("/api/v1/plots/", GetAllPlots).Methods("GET")
 	router.HandleFunc("/api/v1/plots/{plotid}", PlotHandler).Methods("GET", "POST", "PUT", "DELETE")
 	router.HandleFunc("/api/v1/plots/venue/", venueHandler).Methods("GET")

@@ -98,14 +98,4 @@ func populateData(db *sql.DB) {
 			venueMap[p.VenueName] = p.Address
 		}
 	}
-	// exposing for template usage
-	// for v, k := range venueMap {
-	// 	vi := &VenueInformation{VenueName: v, Address: k}
-	// 	VenueInformationList = append(VenueInformationList, *vi)
-	// }
-	// sortVenueInfoList(VenueInformationList, 0, len(VenueInformationList)-1)
 }
-
-// func GetVenueInformationList() []VenueInformation {
-// 	return VenueInformationList
-// }

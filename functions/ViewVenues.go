@@ -30,7 +30,6 @@ func ViewVenues(res http.ResponseWriter, req *http.Request) {
 	// shows all at first
 	// if there's a filter, do the filter before changing the range.
 	fillVenuesList()
-
 	tpl.ExecuteTemplate(res, "venues.html", VenueInformationList)
 }
 
