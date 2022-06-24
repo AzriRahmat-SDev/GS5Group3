@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Community Gardens</title>
+</head>
+
+<body>
+    <h1>{{ .allInfo.Name }}'s Dashboard</h1>
+
+    <div>
+        <nav>
+            <div>
+                <ul>
+                    <li>
+                        <a href="/homepage/"><strong>Home</strong></a>
+                    </li>
+                    <li>
+                        <a href="/user/"><strong>Logout</strong></a>
+                    </li>
+                    <li>
+                        <a href="/logout"><strong>Logout</strong></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <p>Username: {{ .allInfo.Username }}</p>
+    <p>Email: {{ .allInfo.Email }}</p>
+    <form action="">
+        <input type="submit" value="Edit" />
+    </form>
+    <br />
+
+    <h2>Current Bookings</h2>
+    <table>
+        <tr>
+            <th>Booking ID</th>
+            <th>Plot ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+        </tr>
+        {{ range .allInfo.CurrentLeases.Bookings }}
+        <tr>
+            <td><a href="/editbooking/?booking={{ .BookingID }}">{{ .BookingID }}</a></td>
+            <td><a href="/newbooking/?plot={{ .PlotID }}">{{ .PlotID }}</td>
+            <td>{{ .StartDate }}</td>
+            <td>{{ .EndDate }}</td>
+        </tr>
+        {{ end }}
+    </table>
+    <br />
+    
+    <h2>Past Bookings</h2>
+    <table>
+        <tr>
+            <th>Booking ID</th>
+            <th>Plot ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+        </tr>
+        {{ range .allInfo.ExpiredLeases.Bookings }}
+        <tr>
+            <td>{{ .BookingID }}</td>
+            <td><a href="/newbooking/?plot={{ .PlotID }}">{{ .PlotID }}</td>
+            <td>{{ .StartDate }}</td>
+            <td>{{ .EndDate }}</td>
+        </tr>
+        {{ end }}
+    </table>
+</body>
