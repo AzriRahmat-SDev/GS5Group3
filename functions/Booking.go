@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -51,20 +52,37 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	PlotID := req.FormValue("plot")
 
+	var wg sync.WaitGroup
+	wg.Add(3)
+
 	// pull user info
-	cookie, err := req.Cookie("myCookie")
-	if err != nil {
-		http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
-		return
-	}
-	user := getUser(cookie)
+	var user updateUsers
+	go func() {
+		cookie, err := req.Cookie("myCookie")
+		if err != nil {
+			http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
+			return
+		}
+		user = getUser(cookie)
+		wg.Done()
+	}()
 
 	// pull bookings for plot
-	leases := callBookingsAPI("byPlot", PlotID)
-	currentLeases := onlyCurrentLeases(leases)
+	var currentLeases bookings
+	go func() {
+		leases := callBookingsAPI("byPlot", PlotID)
+		currentLeases = onlyCurrentLeases(leases)
+		wg.Done()
+	}()
 
 	// pull plot info
-	plot := callPlotsAPI(PlotID)
+	var plot Plot
+	go func() {
+		plot = callPlotsAPI(PlotID)
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	allInfo := map[string]allInfo{
 		"allInfo": {
@@ -118,26 +136,42 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	BookingID := req.FormValue("booking")
 
+	var wg sync.WaitGroup
+	wg.Add(2)
+
 	// pull user info
-	cookie, err := req.Cookie("myCookie")
-	if err != nil {
-		http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
-		return
-	}
-	user := getUser(cookie)
+	var user updateUsers
+	go func() {
+		cookie, err := req.Cookie("myCookie")
+		if err != nil {
+			http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
+			return
+		}
+		user = getUser(cookie)
+		wg.Done()
+	}()
 
-	// pull bookings for plot
-	currentBooking := callBookingsAPI("byBooking", BookingID)
-	if len(currentBooking.Bookings) == 0 {
-		fmt.Fprintf(res, "Booking does not exist.")
-		return
-	}
+	// pull bookings for plot and plot info
+	var currentBooking, currentLeases bookings
+	var plot Plot
+	go func() {
+		// pull bookings for plot
+		currentBooking := callBookingsAPI("byBooking", BookingID)
+		if len(currentBooking.Bookings) == 0 {
+			fmt.Fprintf(res, "Booking does not exist.")
+			return
+		}
 
-	leases := callBookingsAPI("byPlot", currentBooking.Bookings[0].PlotID)
-	currentLeases := onlyCurrentLeases(leases)
+		leases := callBookingsAPI("byPlot", currentBooking.Bookings[0].PlotID)
+		currentLeases = onlyCurrentLeases(leases)
 
-	// pull plot info
-	plot := callPlotsAPI(currentBooking.Bookings[0].PlotID)
+		// pull plot info
+		plot = callPlotsAPI(currentBooking.Bookings[0].PlotID)
+
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	allInfo := map[string]allInfo{
 		"allInfo": {
