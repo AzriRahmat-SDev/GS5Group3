@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const plotsAPI string = "http://localhost:5001/api/v1/plots/"
+
 type VenueInformation struct {
 	VenueName string `json:"VenueName"`
 	Address   string `json:"Address"`
