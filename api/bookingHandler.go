@@ -147,7 +147,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				// check if plot is available on desired dates
-				if startDateIsBeforeEndDate(newBooking.StartDate, newBooking.EndDate) && plotAvailable(newBooking.PlotID, newBooking.StartDate, newBooking.EndDate) {
+				if startDateIsBeforeEndDate(newBooking.StartDate, newBooking.EndDate) && plotAvailable(newBooking.PlotID, newBooking.StartDate, newBooking.EndDate, "") {
 					// establish connection to database
 					db, err := sql.Open("mysql", connection)
 					if err != nil {
@@ -191,7 +191,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				// check if plot is available for new dates
-				if startDateIsBeforeEndDate(editBooking.StartDate, editBooking.EndDate) && plotAvailable(editBooking.PlotID, editBooking.StartDate, editBooking.EndDate) {
+				if startDateIsBeforeEndDate(editBooking.StartDate, editBooking.EndDate) && plotAvailable(editBooking.PlotID, editBooking.StartDate, editBooking.EndDate, editBooking.BookingID) {
 					// establish connection to database
 					db, err := sql.Open("mysql", connection)
 					if err != nil {
@@ -243,7 +243,7 @@ func bookingExists(booking string) (exists bool) {
 	return exists
 }
 
-func plotAvailable(plotID, startDate, endDate string) (available bool) {
+func plotAvailable(plotID, startDate, endDate, bookingID string) (available bool) {
 	startDateDate, err := time.Parse("2006-01-02", startDate)
 	if err != nil {
 		fmt.Println(err)
@@ -255,6 +255,20 @@ func plotAvailable(plotID, startDate, endDate string) (available bool) {
 
 	query := fmt.Sprintf("SELECT * FROM database.bookings WHERE PlotID='%s' AND LeaseCompleted='false'", plotID)
 	bookings := getBookings(query)
+
+	// exclude your own bookingID from unavailable date ranges
+	if bookingID != "" {
+		tempBookings := map[string][]booking{
+			"bookings": {},
+		}
+
+		for _, v := range bookings["bookings"] {
+			if v.BookingID != bookingID {
+				tempBookings["bookings"] = append(tempBookings["bookings"], v)
+			}
+		}
+		bookings = tempBookings
+	}
 
 	available = true
 	for _, v := range bookings["bookings"] {
