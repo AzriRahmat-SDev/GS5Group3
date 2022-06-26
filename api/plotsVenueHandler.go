@@ -10,39 +10,28 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//Declaring Map Existence globally
+// Plots GET
 func GetAllPlots(w http.ResponseWriter, r *http.Request) {
-	db := OpenVenueDB()
-	defer db.Close()
-	populateData(db)
-	json.NewEncoder(w).Encode(plotMap)
+
+	pMap := makePlotMap("")
+	json.NewEncoder(w).Encode(pMap)
 }
 
+// Venue GET
 func venueHandler(w http.ResponseWriter, r *http.Request) {
-	db := OpenVenueDB()
-	defer db.Close()
-	if !initialized {
-		populateData(db)
-		initialized = true
-	}
-
+	venueMap := makeVenueMap()
 	json.NewEncoder(w).Encode(venueMap)
-
 }
 
+// GET Venue PlotIDs
 func viewVenuePlots(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
-	if !initialized {
-		db := OpenVenueDB()
-		defer db.Close()
-		populateData(db)
-		initialized = true
-	}
 
-	if _, ok := venueMap[params["VenueName"]]; ok {
+	if plotDBRowExists(params["VenueName"], "VenueName") {
 		var plotIDs []string
-		for v, k := range plotMap {
+		pm := makePlotMap("")
+		for v, k := range pm {
 			if k.VenueName == params["VenueName"] {
 				plotIDs = append(plotIDs, v)
 			}
@@ -56,15 +45,12 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	params := mux.Vars(r)
-	if !initialized {
-		populateData(db)
-		initialized = true
-	}
 
 	if r.Method == "GET" {
-		if _, ok := plotMap[params["plotid"]]; ok {
+		if plotDBRowExists(params["plotid"], "PlotID") {
 			fmt.Println("PLOT ID : ", params["plotid"])
-			json.NewEncoder(w).Encode(plotMap[params["plotid"]])
+			p := makePlotMap(params["plotid"])
+			json.NewEncoder(w).Encode(p)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("404 - No Plot found from GET"))
@@ -72,11 +58,10 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "DELETE" {
-		if _, ok := plotMap[params["plotid"]]; ok {
+		if plotDBRowExists(params["plotid"], "PlotID") {
 			DeletePlot(db, params["plotid"])
 			w.WriteHeader(http.StatusAccepted)
 			w.Write([]byte("202 - Plot deleted: " + params["plotid"]))
-			populateData(db)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("404 - No Plot found"))
@@ -95,10 +80,9 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				//basically reads(from client) if plot id does not exist(in DB)
-				if _, ok := plotMap[params["plotid"]]; !ok {
+				if !plotDBRowExists(params["plotid"], "PlotID") {
 					InsertPlot(db, newPlot)
 					fmt.Println("Insert was successful")
-					plotMap[params["plotid"]] = newPlot
 					w.WriteHeader(http.StatusCreated)
 					w.Write([]byte("201 - Plot added: " + params["plotid"]))
 				} else {
@@ -125,7 +109,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("422 - Please supply Plot " + "information " + "in JSON format"))
 					return
 				}
-				if _, ok := plotMap[params["plotid"]]; !ok {
+				if !plotDBRowExists(params["plotid"], "PlotID") {
 					InsertPlot(db, newPlot)
 					fmt.Println("Insert was successful")
 					w.WriteHeader(http.StatusCreated)
@@ -146,4 +130,77 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}
+}
+
+/* Helper to find if val exists in column.
+ */
+func plotDBRowExists(val string, column string) bool {
+	db := OpenVenueDB()
+	defer db.Close()
+	r := false
+	s, err := db.Query("SELECT EXISTS(SELECT * FROM database.plots WHERE " + column + "='" + val + "')")
+	if err != nil {
+		panic(err.Error())
+	}
+	for s.Next() {
+		err = s.Scan(&r)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+	return r
+}
+
+// Returns map values for Plot GET
+func makePlotMap(val string) PlotMap {
+	plotMap := make(map[string]Plot)
+	db := OpenVenueDB()
+	defer db.Close()
+	if val == "" {
+		fmt.Println("Make Full map")
+		query := fmt.Sprintf("SELECT * from plots")
+		res, err := db.Query(query)
+		if err != nil {
+		}
+		for res.Next() {
+			var p Plot
+			res.Scan(&p.PlotID, &p.VenueName, &p.Address)
+			plotMap[p.PlotID] = p
+
+		}
+
+	} else {
+		result, err := db.Query("SELECT * from database.plots WHERE PlotID = '" + val + "'")
+		if err != nil {
+			fmt.Println(err)
+		}
+		for result.Next() {
+			var p Plot
+			err := result.Scan(&p.PlotID, &p.VenueName, &p.Address)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			plotMap["Plot"] = p
+		}
+	}
+	return plotMap
+}
+
+// returns map values for Venue GET
+func makeVenueMap() map[string]string {
+	venueMap := make(VenueMap)
+	db := OpenVenueDB()
+	defer db.Close()
+	query := fmt.Sprintf("SELECT DISTINCT VenueName, Address from plots")
+	res, err := db.Query(query)
+	if err != nil {
+	}
+	for res.Next() {
+		var x string
+		var y string
+		res.Scan(&x, &y)
+		venueMap[x] = y
+
+	}
+	return venueMap
 }

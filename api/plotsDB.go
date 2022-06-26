@@ -14,14 +14,9 @@ type Plot struct {
 	Address   string `json:"Address"`
 }
 
-var plotMap map[string]Plot
-var plotList []Plot
+type PlotMap map[string]Plot
 
-/* Venue Name + Address
- */
-var venueMap map[string]string
-
-var initialized bool = false
+type VenueMap map[string]string
 
 func OpenVenueDB() *sql.DB {
 	db, err := sql.Open("mysql", connection)
@@ -69,33 +64,5 @@ func DeletePlot(db *sql.DB, plotID string) {
 		log.Panic(err.Error())
 	} else {
 		fmt.Printf("\nSuccessful delete plot @ '%s'", plotID)
-	}
-}
-
-// wip dont touch yet
-func nextPlotID(db *sql.DB, venue string) int {
-	return 0
-}
-
-func populateData(db *sql.DB) {
-	for k := range plotMap {
-		delete(plotMap, k)
-	}
-	results, err := db.Query("SELECT * FROM plots")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	for results.Next() {
-		var p Plot
-		err := results.Scan(&p.PlotID, &p.VenueName, &p.Address)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		plotMap[p.PlotID] = p
-		plotList = append(plotList, p)
-		if _, ok := venueMap[p.VenueName]; !ok {
-			venueMap[p.VenueName] = p.Address
-		}
 	}
 }

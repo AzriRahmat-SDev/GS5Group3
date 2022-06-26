@@ -46,6 +46,8 @@ type Plot struct {
 	Address   string `json:"Address"`
 }
 
+type PlotMap map[string]Plot
+
 const apiURL string = "http://localhost:5001/api/v1/"
 const connection string = "root:password@tcp(localhost:32769)/database"
 
@@ -77,10 +79,10 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 	}()
 
 	// pull plot info
-	var plot Plot
+	var plotMap PlotMap
 	go func() {
 		defer wg.Done()
-		plot = callPlotsAPI(PlotID)
+		plotMap = callPlotsAPI(PlotID)
 	}()
 
 	wg.Wait()
@@ -90,9 +92,9 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 			Username:      user.Username,
 			Name:          user.Name,
 			Email:         user.Email,
-			PlotID:        plot.PlotID,
-			VenueName:     plot.VenueName,
-			Address:       plot.Address,
+			PlotID:        plotMap["Plot"].PlotID,
+			VenueName:     plotMap["Plot"].VenueName,
+			Address:       plotMap["Plot"].Address,
 			StartDate:     "",
 			EndDate:       "",
 			CurrentLeases: currentLeases,
@@ -165,7 +167,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 	currentLeases := onlyCurrentLeases(leases)
 
 	// pull plot info
-	plot := callPlotsAPI(currentBooking.Bookings[0].PlotID)
+	plotMap := callPlotsAPI(currentBooking.Bookings[0].PlotID)
 
 	wg.Wait()
 
@@ -174,9 +176,9 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 			Username:      user.Username,
 			Name:          user.Name,
 			Email:         user.Email,
-			PlotID:        plot.PlotID,
-			VenueName:     plot.VenueName,
-			Address:       plot.Address,
+			PlotID:        plotMap["Plot"].PlotID,
+			VenueName:     plotMap["Plot"].VenueName,
+			Address:       plotMap["Plot"].Address,
 			BookingID:     BookingID,
 			StartDate:     currentBooking.Bookings[0].StartDate,
 			EndDate:       currentBooking.Bookings[0].EndDate,
@@ -189,7 +191,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 		StartDate := req.FormValue("StartDate")
 		EndDate := req.FormValue("EndDate")
 
-		jsonBooking := packageBookingJSON(BookingID, plot.PlotID, user.Username, StartDate, EndDate)
+		jsonBooking := packageBookingJSON(BookingID, plotMap["Plot"].PlotID, user.Username, StartDate, EndDate)
 
 		request, err := http.NewRequest(http.MethodPut, apiURL+"bookings/booking/"+BookingID, jsonBooking)
 		if err != nil {
@@ -315,7 +317,7 @@ func onlyCurrentLeases(bookings bookings) (currentLeases bookings) {
 	return currentLeases
 }
 
-func callPlotsAPI(PlotID string) (plot Plot) {
+func callPlotsAPI(PlotID string) (PlotMap PlotMap) {
 	response, err := http.Get(apiURL + "plots/" + PlotID)
 
 	if err == nil {
@@ -324,14 +326,14 @@ func callPlotsAPI(PlotID string) (plot Plot) {
 			fmt.Println(err)
 		}
 
-		json.Unmarshal(data, &plot)
+		json.Unmarshal(data, &PlotMap)
 
 		response.Body.Close()
 	} else {
 		fmt.Println(err)
 	}
-
-	return plot
+	fmt.Println(PlotMap)
+	return PlotMap
 }
 
 func packageBookingJSON(BookingID, PlotID, Username, StartDate, EndDate string) (jsonBooking *bytes.Buffer) {
