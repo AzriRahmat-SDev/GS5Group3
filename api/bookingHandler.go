@@ -95,12 +95,12 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 			query := "SELECT * FROM database.bookings WHERE BookingID = '" + bookingParam + "' LIMIT 1"
 			bookings := getBookings(query)
 
+			// check if booking has not yet been completed
 			leaseCompleted, err := strconv.ParseBool(bookings["bookings"][0].LeaseCompleted)
 			if err != nil {
 				panic(err.Error())
 			}
 
-			// check if booking exists and has not yet been completed
 			if !leaseCompleted {
 				// establish connection to database
 				db, err := sql.Open("mysql", connection)
@@ -118,6 +118,44 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 
 				w.WriteHeader(http.StatusAccepted)
 				w.Write([]byte("202 - Booking canceled: " + bookingParam))
+			} else {
+				w.WriteHeader(http.StatusNotFound)
+				w.Write([]byte("404 - Booking has already been completed"))
+			}
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("404 - Booking does not exist"))
+		}
+	}
+
+	if r.Method == "PATCH" {
+		if bookingExists(bookingParam) {
+			query := "SELECT * FROM database.bookings WHERE BookingID = '" + bookingParam + "' LIMIT 1"
+			bookings := getBookings(query)
+
+			// check if booking has not yet been completed
+			leaseCompleted, err := strconv.ParseBool(bookings["bookings"][0].LeaseCompleted)
+			if err != nil {
+				panic(err.Error())
+			}
+
+			if !leaseCompleted {
+				// establish connection to database
+				db, err := sql.Open("mysql", connection)
+				if err != nil {
+					panic(err.Error())
+				}
+				defer db.Close()
+
+				query := fmt.Sprintf("UPDATE database.bookings SET LeaseCompleted='true' WHERE BookingID='%s'", bookingParam)
+
+				_, err = db.Query(query)
+				if err != nil {
+					panic(err.Error())
+				}
+
+				w.WriteHeader(http.StatusAccepted)
+				w.Write([]byte("202 - Booking " + bookingParam + " has been successfully marked as completed"))
 			} else {
 				w.WriteHeader(http.StatusNotFound)
 				w.Write([]byte("404 - Booking has already been completed"))
