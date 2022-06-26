@@ -1,3 +1,4 @@
+// Package api is an API server that runs independent of any client.
 package api
 
 import (

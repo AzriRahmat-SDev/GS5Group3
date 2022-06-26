@@ -1,3 +1,4 @@
+// Package main is the client and is independent of the API.
 package main
 
 import (
