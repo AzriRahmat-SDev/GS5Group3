@@ -180,7 +180,7 @@ func makePlotMap(val string) PlotMap {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			plotMap[val] = p
+			plotMap["Plot"] = p
 		}
 	}
 	return plotMap
