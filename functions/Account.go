@@ -166,3 +166,12 @@ func UpdateResult(res http.ResponseWriter, req *http.Request) {
 	}
 	tpl.ExecuteTemplate(res, "result.html", "User was successfully updated")
 }
+
+func GetAllUsers(res http.ResponseWriter, req *http.Request) {
+	//insert the form handler here
+
+}
+
+func DeleteUsername(res http.ResponseWriter, req *http.Request) {
+
+}

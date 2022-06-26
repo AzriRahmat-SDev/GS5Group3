@@ -11,8 +11,7 @@ import (
 )
 
 // Plots GET
-func GetAllPlots(w http.ResponseWriter, r *http.Request) {
-
+func getAllPlots(w http.ResponseWriter, r *http.Request) {
 	pMap := makePlotMap("")
 	json.NewEncoder(w).Encode(pMap)
 }
@@ -40,7 +39,7 @@ func viewVenuePlots(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func PlotHandler(w http.ResponseWriter, r *http.Request) {
+func plotHandler(w http.ResponseWriter, r *http.Request) {
 	db := OpenVenueDB()
 	defer db.Close()
 
@@ -91,7 +90,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			} else {
 				w.WriteHeader(http.StatusUnprocessableEntity)
-				w.Write([]byte("422 - Please supply Plot information " + "in JSON format"))
+				w.Write([]byte("422 - Please supply Plot information in JSON format"))
 			}
 		}
 		//PUT request here
@@ -100,10 +99,7 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 			reqBody, err := ioutil.ReadAll(r.Body)
 
 			if err == nil {
-
 				json.Unmarshal(reqBody, &newPlot)
-
-				// if both fields are empty
 				if newPlot.VenueName == "" && newPlot.Address == "" {
 					w.WriteHeader(http.StatusUnprocessableEntity)
 					w.Write([]byte("422 - Please supply Plot " + "information " + "in JSON format"))
