@@ -40,6 +40,7 @@
             <th>Plot ID</th>
             <th>Start Date</th>
             <th>End Date</th>
+            <th></th>
         </tr>
         {{ range .allInfo.CurrentLeases.Bookings }}
         <tr>
@@ -47,6 +48,9 @@
             <td><a href="/newbooking/?plot={{ .PlotID }}">{{ .PlotID }}</td>
             <td>{{ .StartDate }}</td>
             <td>{{ .EndDate }}</td>
+            <td>
+                <a href="/completebooking/?booking={{ .BookingID }}">Mark as Completed</a>
+            </td>
         </tr>
         {{ end }}
     </table>

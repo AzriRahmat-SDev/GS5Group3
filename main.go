@@ -1,3 +1,4 @@
+// Package main is the client and is independent of the API.
 package main
 
 import (
@@ -31,8 +32,13 @@ func main() {
 	r.HandleFunc("/signup", functions.SignUp)
 
 	r.HandleFunc("/loginauth", functions.LoginAuth)        //both admin and users
+<<<<<<< HEAD
 	r.HandleFunc("/allusers", functions.GetAllUsers)       //only admin
 	r.HandleFunc("/delete/", functions.DeleteUsername)     //only admin
+=======
+	r.HandleFunc("/allusers", api.GetAllUsers)             //only admin
+	r.HandleFunc("/delete/", api.DeleteRecord)             //both admin and users
+>>>>>>> AR-USERCRUD-REFACTOR
 	r.HandleFunc("/update/", functions.Update)             //both admin and users
 	r.HandleFunc("/updateresult/", functions.UpdateResult) //both admin and users
 	r.HandleFunc("/homepage/", functions.Homepage)         //only users
@@ -43,6 +49,7 @@ func main() {
 	r.HandleFunc("/newbooking/", functions.NewBooking)
 	r.HandleFunc("/editbooking/", functions.EditBooking)
 	r.HandleFunc("/deletebooking/", functions.DeleteBooking)
+	r.HandleFunc("/completebooking/", functions.CompleteBooking)
 	r.HandleFunc("/logout", functions.Logout)
 	r.HandleFunc("/logoutAdmin", functions.LogoutAdmin)
 

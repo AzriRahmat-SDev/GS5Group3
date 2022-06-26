@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// booking struct corresponds to the bookings table in the database
 type booking struct {
 	BookingID      string `json:"BookingID"`
 	PlotID         string `json:"PlotID"`
@@ -24,6 +25,10 @@ type booking struct {
 
 const connection string = "root:password@tcp(localhost:32769)/database"
 
+// getHandler handles three types of requests depending on which parameters get passed into the URL.
+// If a Username is passed into the URL, this function will pull all bookings associated with that Username.
+// If a PlotID is passed into the URL, this function will pull all bookings associated with that PlotID.
+// If no paramters are passed into the URL, this function will pull all bookings in the database.
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userParam := params["Username"]
@@ -44,6 +49,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bookings)
 }
 
+// getBookings is a support function that takes a SQL query as argument and returns all resulting bookings.
 func getBookings(query string) (bookings map[string][]booking) {
 	// establish connection to database
 	db, err := sql.Open("mysql", connection)
@@ -75,6 +81,8 @@ func getBookings(query string) (bookings map[string][]booking) {
 	return tempBookings
 }
 
+// bookingHandler handles DELETE, POST, PUT, PATCH, and GET requests.
+// For GET, it only handles requests for one BookingID.
 func bookingHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	bookingParam := params["BookingID"]
@@ -95,12 +103,12 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 			query := "SELECT * FROM database.bookings WHERE BookingID = '" + bookingParam + "' LIMIT 1"
 			bookings := getBookings(query)
 
+			// check if booking has not yet been completed
 			leaseCompleted, err := strconv.ParseBool(bookings["bookings"][0].LeaseCompleted)
 			if err != nil {
 				panic(err.Error())
 			}
 
-			// check if booking exists and has not yet been completed
 			if !leaseCompleted {
 				// establish connection to database
 				db, err := sql.Open("mysql", connection)
@@ -118,6 +126,44 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 
 				w.WriteHeader(http.StatusAccepted)
 				w.Write([]byte("202 - Booking canceled: " + bookingParam))
+			} else {
+				w.WriteHeader(http.StatusNotFound)
+				w.Write([]byte("404 - Booking has already been completed"))
+			}
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("404 - Booking does not exist"))
+		}
+	}
+
+	if r.Method == "PATCH" {
+		if bookingExists(bookingParam) {
+			query := "SELECT * FROM database.bookings WHERE BookingID = '" + bookingParam + "' LIMIT 1"
+			bookings := getBookings(query)
+
+			// check if booking has not yet been completed
+			leaseCompleted, err := strconv.ParseBool(bookings["bookings"][0].LeaseCompleted)
+			if err != nil {
+				panic(err.Error())
+			}
+
+			if !leaseCompleted {
+				// establish connection to database
+				db, err := sql.Open("mysql", connection)
+				if err != nil {
+					panic(err.Error())
+				}
+				defer db.Close()
+
+				query := fmt.Sprintf("UPDATE database.bookings SET LeaseCompleted='true' WHERE BookingID='%s'", bookingParam)
+
+				_, err = db.Query(query)
+				if err != nil {
+					panic(err.Error())
+				}
+
+				w.WriteHeader(http.StatusAccepted)
+				w.Write([]byte("202 - Booking " + bookingParam + " has been successfully marked as completed"))
 			} else {
 				w.WriteHeader(http.StatusNotFound)
 				w.Write([]byte("404 - Booking has already been completed"))
@@ -220,6 +266,7 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// bookingExists takes a BookingID and checks whether it currently exists in the database.
 func bookingExists(booking string) (exists bool) {
 	// establish connection to database
 	db, err := sql.Open("mysql", connection)
@@ -243,6 +290,7 @@ func bookingExists(booking string) (exists bool) {
 	return exists
 }
 
+// plotAvailable takes PlotID and desired start and end dates and returns a bool noting whether the desired dates are available for booking.
 func plotAvailable(plotID, startDate, endDate, bookingID string) (available bool) {
 	startDateDate, err := time.Parse("2006-01-02", startDate)
 	if err != nil {
@@ -295,6 +343,7 @@ func plotAvailable(plotID, startDate, endDate, bookingID string) (available bool
 	return available
 }
 
+// startDateIsBeforeEndDate takes a start and end date and makes sure the start date is before the end date.
 func startDateIsBeforeEndDate(startDate, endDate string) bool {
 	startDateDate, err := time.Parse("2006-01-02", startDate)
 	if err != nil {

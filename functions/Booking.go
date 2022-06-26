@@ -1,3 +1,4 @@
+// Package functions contains all of the functions that serve pages as well as many support functions.
 package functions
 
 import (
@@ -13,6 +14,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// allInfo struct is a combination of data from all three tables in the database: users, plots, and bookings.
 type allInfo struct {
 	Username      string
 	Name          string
@@ -51,6 +53,7 @@ type PlotMap map[string]Plot
 const apiURL string = "http://localhost:5001/api/v1/"
 const connection string = "root:password@tcp(localhost:32769)/database"
 
+// NewBooking serves a page that allows a user to make a new booking.
 func NewBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	PlotID := req.FormValue("plot")
@@ -135,6 +138,7 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(res, "newbooking.gohtml", allInfo)
 }
 
+// EditBooking serves a page that allows the user to edit an existing booking dates.
 func EditBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	BookingID := req.FormValue("booking")
@@ -228,6 +232,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(res, "editbooking.gohtml", allInfo)
 }
 
+// DeleteBooking deletes a booking.
 func DeleteBooking(res http.ResponseWriter, req *http.Request) {
 	// URL queries
 	BookingID := req.FormValue("booking")
@@ -262,6 +267,42 @@ func DeleteBooking(res http.ResponseWriter, req *http.Request) {
 	response.Body.Close()
 }
 
+// CompleteBooking marks a booking lease as having been completed.
+func CompleteBooking(res http.ResponseWriter, req *http.Request) {
+	// URL queries
+	BookingID := req.FormValue("booking")
+
+	request, err := http.NewRequest(http.MethodPatch, apiURL+"bookings/booking/"+BookingID, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	if err == nil {
+		data, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Println(string(data))
+
+		if response.StatusCode == 202 {
+			http.Redirect(res, req, "/user/", http.StatusSeeOther)
+		} else {
+			fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
+			return
+		}
+
+	} else {
+		fmt.Println(err)
+	}
+
+	response.Body.Close()
+}
+
+// callBookingsAPI allows the client to call the bookings API by PlotID, BookingID, or Username.
 func callBookingsAPI(byCriteria, criteria string) (bookings bookings) {
 	var response *http.Response
 
@@ -303,6 +344,7 @@ func callBookingsAPI(byCriteria, criteria string) (bookings bookings) {
 	return bookings
 }
 
+// onlyCurrentLeases takes a list of bookings and returns only the bookings that have not been marked as completed.
 func onlyCurrentLeases(bookings bookings) (currentLeases bookings) {
 	for _, v := range bookings.Bookings {
 		leaseBool, err := strconv.ParseBool(v.LeaseCompleted)
@@ -317,6 +359,7 @@ func onlyCurrentLeases(bookings bookings) (currentLeases bookings) {
 	return currentLeases
 }
 
+// callPlotsAPI allows the client to call the plot API to get information on a single PlotID.
 func callPlotsAPI(PlotID string) (PlotMap PlotMap) {
 	response, err := http.Get(apiURL + "plots/" + PlotID)
 
@@ -336,6 +379,7 @@ func callPlotsAPI(PlotID string) (PlotMap PlotMap) {
 	return PlotMap
 }
 
+// packageBookingJSON takes the information necessary to create or modify a row in the database and packages it into JSON format for the API.
 func packageBookingJSON(BookingID, PlotID, Username, StartDate, EndDate string) (jsonBooking *bytes.Buffer) {
 	booking := booking{
 		BookingID: BookingID,
@@ -354,6 +398,7 @@ func packageBookingJSON(BookingID, PlotID, Username, StartDate, EndDate string) 
 	return jsonBooking
 }
 
+// getUser takes the cookie value from the browser and gets user information from the users database.
 func getUser(cookie *http.Cookie) (user updateUsers) {
 	db, err := sql.Open("mysql", connection)
 	if err != nil {
