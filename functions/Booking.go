@@ -262,6 +262,40 @@ func DeleteBooking(res http.ResponseWriter, req *http.Request) {
 	response.Body.Close()
 }
 
+func CompleteBooking(res http.ResponseWriter, req *http.Request) {
+	// URL queries
+	BookingID := req.FormValue("booking")
+
+	request, err := http.NewRequest(http.MethodPatch, apiURL+"bookings/booking/"+BookingID, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	if err == nil {
+		data, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Println(string(data))
+
+		if response.StatusCode == 202 {
+			http.Redirect(res, req, "/user/", http.StatusSeeOther)
+		} else {
+			fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
+			return
+		}
+
+	} else {
+		fmt.Println(err)
+	}
+
+	response.Body.Close()
+}
+
 func callBookingsAPI(byCriteria, criteria string) (bookings bookings) {
 	var response *http.Response
 
