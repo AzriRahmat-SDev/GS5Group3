@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -122,7 +123,7 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 			fmt.Println(string(data))
 
 			if response.StatusCode == 201 {
-				http.Redirect(res, req, "/homepage/", http.StatusSeeOther)
+				http.Redirect(res, req, "/newbooking/?plot="+PlotID, http.StatusSeeOther)
 			} else {
 				fmt.Fprintf(res, string(data))
 				return
@@ -416,4 +417,50 @@ func getUser(cookie *http.Cookie) (user updateUsers) {
 	}
 
 	return user
+}
+
+// startDateIsBeforeEndDate takes a start and end date and makes sure the start date is before the end date.
+func startDateIsBeforeEndDate(startDate, endDate string) bool {
+	startDateDate, err := time.Parse("2006-01-02", startDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+	endDateDate, err := time.Parse("2006-01-02", endDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if startDateDate.Before(endDateDate) {
+		return true
+	} else {
+		return false
+	}
+}
+
+// plotAvailable takes desired start and end dates and returns a bool noting whether the desired dates are available for booking.
+func plotAvailable(desiredStartDate, desiredEndDate, bookingStartDate, bookingEndDate string) (available bool) {
+	desiredStartDateDate, err := time.Parse("2006-01-02", desiredStartDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+	desiredEndDateDate, err := time.Parse("2006-01-02", desiredEndDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+	bookingStartDateDate, err := time.Parse("2006-01-02", bookingStartDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+	bookingEndDateDate, err := time.Parse("2006-01-02", bookingEndDate)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if desiredStartDateDate.Before(bookingEndDateDate) && desiredStartDateDate.After(bookingStartDateDate) {
+		return false
+	} else if desiredEndDateDate.Before(bookingEndDateDate) && desiredEndDateDate.After(bookingStartDateDate) {
+		return false
+	} else {
+		return true
+	}
 }
