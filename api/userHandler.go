@@ -84,7 +84,7 @@ func userHandler(res http.ResponseWriter, req *http.Request) {
 					InsertUser(db, newUser)
 					fmt.Println("Insert was successful")
 					res.WriteHeader(http.StatusCreated)
-					res.Write([]byte("201 - Username added: " + params["username"]))
+					res.Write([]byte("201 - Information update: " + params["username"]))
 				} else {
 					if newUser.Name != "" {
 						EditUserDisplayName(db, params["username"], newUser.Name)
@@ -92,7 +92,10 @@ func userHandler(res http.ResponseWriter, req *http.Request) {
 					if newUser.Email != "" {
 						EditUserEmail(db, params["username"], newUser.Email)
 					}
-					res.Write([]byte("201-" + params["username"] + " has been updated." + newUser.Name + newUser.Email))
+					if newUser.Username != "" {
+						EditUsername(db, params["username"], newUser.Username)
+					}
+					res.Write([]byte("201-" + params["username"] + " has been updated" + "\nNew Display name: " + newUser.Name + "\nNew Username: " + newUser.Username + "\nNew Email: " + newUser.Email))
 				}
 			} else {
 				res.WriteHeader(http.StatusUnprocessableEntity)
@@ -108,7 +111,7 @@ func userExist(val string, column string) bool {
 
 	r := false
 
-	s, err := db.Query("SELECT EXIST(SELECT * FROM database.users WHERE " + column + "=" + val + "')")
+	s, err := db.Query("SELECT EXISTS (SELECT * FROM database.users WHERE " + column + "='" + val + "')")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -128,7 +131,7 @@ func makeUserMap(val string) UserMap {
 
 	if val == "" {
 		fmt.Println("Making Full map of users")
-		query := fmt.Sprintf("SELECT * from users")
+		query := fmt.Sprintf("SELECT Name,Username,Email FROM users")
 		res, err := db.Query(query)
 		if err != nil {
 		}
@@ -138,7 +141,7 @@ func makeUserMap(val string) UserMap {
 			userMap[u.Username] = u
 		}
 	} else {
-		result, err := db.Query("SELECT * from database.users WHERE Username = '" + val + "'")
+		result, err := db.Query("SELECT Name,Username,Email from database.users WHERE Username = '" + val)
 		if err != nil {
 			fmt.Println(err)
 		}
