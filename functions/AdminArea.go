@@ -57,7 +57,7 @@ func DeleteRecord(res http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-
+		InfoLogger.Printf("User %s deleted from user database.", username)
 		tpl.ExecuteTemplate(res, "result.html", "User was Successfully Deleted")
 	}
 
