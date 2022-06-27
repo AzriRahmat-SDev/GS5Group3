@@ -136,7 +136,7 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 		response.Body.Close()
 	}
 
-	tpl.ExecuteTemplate(res, "newbooking.gohtml", allInfo)
+	tpl.ExecuteTemplate(res, "newbooking.html", allInfo)
 }
 
 // EditBooking serves a page that allows the user to edit an existing booking dates.
@@ -230,7 +230,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 		response.Body.Close()
 	}
 
-	tpl.ExecuteTemplate(res, "editbooking.gohtml", allInfo)
+	tpl.ExecuteTemplate(res, "editbooking.html", allInfo)
 }
 
 // DeleteBooking deletes a booking.

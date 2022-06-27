@@ -26,7 +26,7 @@
 						placeholder="Username"
 						autocomplete="off"
 					/>
-					<label for="username" class="form-label">username</label>
+					<label for="username" class="form-label">Username</label>
 				</div>
 				<div class="mb-3 form-floating">
 					<input
@@ -37,13 +37,15 @@
 						placeholder="Password"
 						autocomplete="off"
 					/>
-					<label for="password" class="form-label">password</label>
+					<label for="password" class="form-label">Password</label>
 				</div>
 				<input class="btn btn-success" type="submit" value="Submit" />
 			</form>
+			{{if .}}
+			<label class="text-danger">{{.}}</label>
+			{{end}}
 			<hr class="mb-3" style="color: gray" />
 			<p>Don't have an account? <a href="/signup">Sign up</a></p>
 		</div>
-		{{if .}} {{.}} {{end}}
 	</body>
 </html>

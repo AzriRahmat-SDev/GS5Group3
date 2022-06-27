@@ -52,7 +52,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 			passwordVerification = true
 		}
 		if !pswdLowercase || !pswdUppercase || !pswdNumber || !pswdSpecial || !passwordVerification {
-			tpl.ExecuteTemplate(res, "signup.html", "please check username and password criteria")
+			tpl.ExecuteTemplate(res, "signup.html", "Please check Username and Password criteria")
 			return
 		}
 		//end password verification
@@ -106,7 +106,7 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 
 		if err != nil {
 			fmt.Println("error selecting Hash in db by Username")
-			tpl.ExecuteTemplate(res, "login.html", "check username and password")
+			tpl.ExecuteTemplate(res, "login.html", "Either Username or Password was incorrect")
 			return
 		}
 		err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
@@ -122,7 +122,7 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		tpl.ExecuteTemplate(res, "login.html", "check username and password")
+		tpl.ExecuteTemplate(res, "login.html", "Check Username and Password")
 	}
 }
 

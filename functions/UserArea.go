@@ -40,5 +40,5 @@ func UserArea(res http.ResponseWriter, req *http.Request) {
 		},
 	}
 
-	tpl.ExecuteTemplate(res, "userarea.gohtml", allInfo)
+	tpl.ExecuteTemplate(res, "userarea.html", allInfo)
 }
