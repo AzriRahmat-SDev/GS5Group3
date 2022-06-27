@@ -26,14 +26,22 @@ var plotList []string
 
 var VenueInformationList []VenueInformation
 
+// var venueListPulled bool = false
+
 func ViewVenues(res http.ResponseWriter, req *http.Request) {
-	// shows all at first
-	// if there's a filter, do the filter before changing the range.
+
+	// if !venueListPulled {
+	// to be called again by admins if any changes are made.
 	fillVenuesList()
+	// 	venueListPulled = true
+	// }
 	tpl.ExecuteTemplate(res, "venues.html", VenueInformationList)
 }
 
 func fillVenuesList() {
+
+	venueMap = make(map[string]string)
+	VenueInformationList = []VenueInformation{}
 	res, err := http.Get(plotsAPI + "venue/")
 	if err == nil {
 		data, err := ioutil.ReadAll(res.Body)
