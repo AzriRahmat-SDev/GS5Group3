@@ -2,6 +2,32 @@
 <html>
   <body>
   <h1> Choose a Plot ID </h1>
+
+  <h3>Filter by Available Dates</h3>
+  <form method = "POST">
+
+  <p>Desired Start Date:</p>
+  <input
+      type="date"
+      name="StartDate"
+      placeholder=""
+  />
+
+  <p>Desired End Date:</p>
+  <input
+      type="date"
+      name="EndDate"
+      placeholder=""
+  />
+  
+  <br />
+  <br />
+
+  <input type="submit" value="Submit">
+  <input type="submit" value="Reset">
+  </form>
+  <br />
+
   {{range .}}
   <h2>{{.VenueName}}<h2>>
   <a href="/newbooking/?plot={{.PlotID}}">{{.PlotID}}</a></p>
