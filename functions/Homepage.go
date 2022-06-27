@@ -16,10 +16,10 @@ func Homepage(res http.ResponseWriter, req *http.Request) {
 				panic("Error in results")
 			}
 			defer results.Close()
-			var venueArr []api.Plot
+			var venueArr []Plot
 
 			for results.Next() {
-				var venue api.Plot
+				var venue Plot
 				err := results.Scan(&venue.PlotID, &venue.VenueName, &venue.Address)
 				if err != nil {
 					panic("Error in scanning")

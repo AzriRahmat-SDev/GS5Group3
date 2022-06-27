@@ -48,7 +48,7 @@ func populateUserData(db *sql.DB) {
 		delete(userMap, k)
 	}
 
-	results, err := db.Query("Select * FROM users")
+	results, err := db.Query("Select Name, Username, Email FROM users")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
