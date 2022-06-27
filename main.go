@@ -32,8 +32,8 @@ func main() {
 	r.HandleFunc("/signup", functions.SignUp)
 
 	r.HandleFunc("/loginauth", functions.LoginAuth)        //both admin and users
-	r.HandleFunc("/allusers", api.GetAllUsers)             //only admin
-	r.HandleFunc("/delete/", api.DeleteRecord)             //both admin and users
+	r.HandleFunc("/allusers", functions.GetAllUsers)       //only admin
+	r.HandleFunc("/delete/", functions.DeleteUsername)     //only admin
 	r.HandleFunc("/update/", functions.Update)             //both admin and users
 	r.HandleFunc("/updateresult/", functions.UpdateResult) //both admin and users
 	r.HandleFunc("/homepage/", functions.Homepage)         //only users

@@ -20,7 +20,6 @@ type VenueMap map[string]string
 
 func OpenVenueDB() *sql.DB {
 	db, err := sql.Open("mysql", connection)
-
 	if err != nil {
 		log.Fatal(err.Error())
 	}
