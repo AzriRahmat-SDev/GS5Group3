@@ -33,6 +33,7 @@ func main() {
 
 	r.HandleFunc("/loginauth", functions.LoginAuth) //both admin and users
 	r.HandleFunc("/allusers", functions.AllUsers)   //only admin
+	r.HandleFunc("/addeditplot", functions.AddOrEditPlot)
 	r.HandleFunc("/deleteplot", functions.DeletePlot)
 	r.HandleFunc("/delete/", functions.DeleteRecord)       //both admin and users
 	r.HandleFunc("/update/", functions.Update)             //both admin and users

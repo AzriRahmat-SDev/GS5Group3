@@ -1,6 +1,8 @@
 package functions
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -63,8 +65,40 @@ func DeleteRecord(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func AddPlot() {
+// If the plotid exists, it will change the venue name and address.
+func AddOrEditPlot(res http.ResponseWriter, req *http.Request) {
+	if alreadyLoggedInAdmin(res, req) {
+		if req.Method == http.MethodPost {
+			plotID := req.FormValue("plotid")
+			venueName := req.FormValue("venuename")
+			address := req.FormValue("address")
 
+			p := Plot{
+				PlotID:    plotID,
+				VenueName: venueName,
+				Address:   address,
+			}
+			r, err := json.Marshal(p)
+			input := bytes.NewBuffer(r)
+			if err != nil {
+				ErrorLogger.Println("Error in json format!")
+			}
+			request, err := http.NewRequest(http.MethodPut, plotsAPI+p.PlotID, input)
+			request.Header.Set("Content-Type", "application/json")
+			client := &http.Client{}
+			response, err := client.Do(request)
+
+			if response.StatusCode == 201 {
+				InfoLogger.Println("A method put was made as ", p)
+				http.Redirect(res, req, "/allusers", http.StatusSeeOther)
+			} else {
+				ErrorLogger.Println("Attempted put at ", request.URL, "but failed with error", response.StatusCode)
+				return
+			}
+
+		}
+		tpl.ExecuteTemplate(res, "addOrEdit.html", req)
+	}
 }
 
 func DeletePlot(res http.ResponseWriter, req *http.Request) {
@@ -89,6 +123,7 @@ func DeletePlot(res http.ResponseWriter, req *http.Request) {
 			response, err := client.Do(request)
 			if response.StatusCode == 202 {
 				InfoLogger.Println("Deleted PlotID", plotToDelete)
+				http.Redirect(res, req, "/allusers", http.StatusSeeOther)
 			} else {
 				ErrorLogger.Println("Attempted delete at ", plotToDelete, "but failed with error", response.StatusCode)
 				return
