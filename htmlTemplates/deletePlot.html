@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <body>
+  <h1>Select on a PlotID to delete it.</h1>
+  <form method = "post">
+  <br>
+  <select name ="plotid"> PlotIDs:
+  {{range .}}
+  <option value="{{.}}">{{.}}</option>
+    {{end}}
+    <input type ="submit" value ="Delete">
+    </select>
+    </form>
+  </body>
+</html>

@@ -68,7 +68,7 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			fmt.Println("Error in  Signup Query!")
 		}
-
+		InfoLogger.Printf("User %s created.", username)
 		http.Redirect(res, req, "/loginauth", 302)
 	}
 

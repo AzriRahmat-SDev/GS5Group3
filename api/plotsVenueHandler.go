@@ -157,7 +157,6 @@ func makePlotMap(val string) PlotMap {
 	db := OpenVenueDB()
 	defer db.Close()
 	if val == "" {
-		fmt.Println("Make Full map")
 		query := fmt.Sprintf("SELECT * from plots")
 		res, err := db.Query(query)
 		if err != nil {

@@ -62,3 +62,40 @@ func DeleteRecord(res http.ResponseWriter, req *http.Request) {
 	}
 
 }
+
+func AddPlot() {
+
+}
+
+func DeletePlot(res http.ResponseWriter, req *http.Request) {
+	if alreadyLoggedInAdmin(res, req) {
+		var plotIDList []string
+		fillVenuesList()
+		for _, v := range VenueInformationList {
+			i := getPlotList(v.VenueName)
+			for _, j := range i {
+				plotIDList = append(plotIDList, j)
+			}
+		}
+		sortPlotIDs(plotIDList, 0, len(plotIDList)-1)
+
+		if req.Method == http.MethodPost {
+			plotToDelete := req.FormValue("plotid")
+			request, err := http.NewRequest(http.MethodDelete, plotsAPI+plotToDelete, nil)
+			if err != nil {
+				ErrorLogger.Println("Attempted delete at ", plotToDelete, "but failed.")
+			}
+			client := &http.Client{}
+			response, err := client.Do(request)
+			if response.StatusCode == 202 {
+				InfoLogger.Println("Deleted PlotID", plotToDelete)
+			} else {
+				ErrorLogger.Println("Attempted delete at ", plotToDelete, "but failed with error", response.StatusCode)
+				return
+			}
+		}
+
+		tpl.ExecuteTemplate(res, "deletePlot.html", plotIDList)
+	}
+
+}
