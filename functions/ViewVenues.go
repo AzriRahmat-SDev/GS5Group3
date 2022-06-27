@@ -30,15 +30,15 @@ var VenueInformationList []VenueInformation
 // var venueListPulled bool = false
 
 func ViewVenues(res http.ResponseWriter, req *http.Request) {
-
-	// if !venueListPulled {
-	// to be called again by admins if any changes are made.
-	fillVenuesList()
-	// 	venueListPulled = true
-	// }
-	tpl.ExecuteTemplate(res, "venues.html", VenueInformationList)
+	if alreadyLoggedIn(res, req) {
+		// if !venueListPulled {
+		// to be called again by admins if any changes are made.
+		fillVenuesList()
+		// 	venueListPulled = true
+		// }
+		tpl.ExecuteTemplate(res, "venues.html", VenueInformationList)
+	}
 }
-
 func fillVenuesList() {
 
 	venueMap = make(map[string]string)
@@ -91,60 +91,62 @@ func venueInfoPartition(v []VenueInformation, left int, right int) int {
 // Viewing Specific Venue with PlotID Information:
 func ViewVenuePlots(res http.ResponseWriter, req *http.Request) {
 
-	venueName := req.FormValue("VenueName")
-	plotList := getPlotList(venueName)
-	var venuePlotInfoList []VenuePlotInfo
-	sortPlotIDs(plotList, 0, len(plotList)-1)
+	if alreadyLoggedIn(res, req) {
+		venueName := req.FormValue("VenueName")
+		plotList := getPlotList(venueName)
+		var venuePlotInfoList []VenuePlotInfo
+		sortPlotIDs(plotList, 0, len(plotList)-1)
 
-	for _, k := range plotList {
-		bookings := callBookingsAPI("byPlot", k)
-		bookings = onlyCurrentLeases(bookings)
+		for _, k := range plotList {
+			bookings := callBookingsAPI("byPlot", k)
+			bookings = onlyCurrentLeases(bookings)
 
-		x := VenuePlotInfo{
-			VenueName: venueName,
-			PlotID:    k,
-			Bookings:  bookings.Bookings,
-		}
-		venuePlotInfoList = append(venuePlotInfoList, x)
-	}
-
-	venuePlotInfoListFinal := venuePlotInfoList
-
-	// filter plots by date when form is submitted
-	if req.Method == http.MethodPost {
-		StartDate := req.FormValue("StartDate")
-		EndDate := req.FormValue("EndDate")
-
-		if StartDate != "" && EndDate != "" {
-			if !startDateIsBeforeEndDate(StartDate, EndDate) {
-				res.WriteHeader(http.StatusUnprocessableEntity)
-				res.Write([]byte("422 - Start date is not before end date"))
-				return
+			x := VenuePlotInfo{
+				VenueName: venueName,
+				PlotID:    k,
+				Bookings:  bookings.Bookings,
 			}
+			venuePlotInfoList = append(venuePlotInfoList, x)
+		}
 
-			var tempPlots []VenuePlotInfo
-			for _, v := range venuePlotInfoList {
+		venuePlotInfoListFinal := venuePlotInfoList
 
-				available := true
+		// filter plots by date when form is submitted
+		if req.Method == http.MethodPost {
+			StartDate := req.FormValue("StartDate")
+			EndDate := req.FormValue("EndDate")
 
-				for _, value := range v.Bookings {
-					if !plotAvailable(StartDate, EndDate, value.StartDate, value.EndDate) {
-						available = false
-						break
+			if StartDate != "" && EndDate != "" {
+				if !startDateIsBeforeEndDate(StartDate, EndDate) {
+					res.WriteHeader(http.StatusUnprocessableEntity)
+					res.Write([]byte("422 - Start date is not before end date"))
+					return
+				}
+
+				var tempPlots []VenuePlotInfo
+				for _, v := range venuePlotInfoList {
+
+					available := true
+
+					for _, value := range v.Bookings {
+						if !plotAvailable(StartDate, EndDate, value.StartDate, value.EndDate) {
+							available = false
+							break
+						}
 					}
-				}
 
-				if available == true {
-					tempPlots = append(tempPlots, v)
-				}
+					if available == true {
+						tempPlots = append(tempPlots, v)
+					}
 
+				}
+				venuePlotInfoListFinal = tempPlots
 			}
-			venuePlotInfoListFinal = tempPlots
+
 		}
 
+		tpl.ExecuteTemplate(res, "viewvenueplots.html", venuePlotInfoListFinal)
 	}
-
-	tpl.ExecuteTemplate(res, "viewvenueplots.html", venuePlotInfoListFinal)
 }
 
 func getPlotList(venueName string) []string {
