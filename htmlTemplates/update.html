@@ -8,49 +8,50 @@
 			crossorigin="anonymous"
 		/>
 	</head>
+
+	<body class="bg-light">
+		<div class="container m-5">
+			<h1>Update User</h1>
+		</div>
+		<div class="container m-5">
+			<form action="/updateresult/?username={{.Username}}" method="POST">
+				<div class="mb-3 form-floating">
+					<input
+						type="text"
+						class="form-control form-control-lg"
+						id="nameName"
+						name="nameName"
+						value="{{.Name}}"
+						autocomplete="off"
+					/>
+					<label for="name" class="form-label">Name</label>
+				</div>
+				<div class="mb-3 form-floating">
+					<input
+						type="text"
+						class="form-control form-control-lg"
+						id="UserName"
+						name="userName"
+						value="{{.Username}}"
+						autocomplete="off"
+					/>
+					<label for="Username" class="form-label">Username</label>
+				</div>
+				<div class="mb-3 form-floating">
+					<input
+						type="text"
+						class="form-control form-control-lg"
+						id="emailName"
+						name="emailName"
+						value="{{.Email}}"
+						autocomplete="off"
+					/>
+					<label for="Email" class="form-label">Email</label>
+				</div>
+				<input class="btn btn-success" type="submit" value="Update User" />
+			</form>
+			<br />
+			<a href="/allusers">Back to all users</a>
+		</div>
+	</body>
 </html>
-<body class="bg-light">
-	<div class="container m-5">
-		<h1>Update User</h1>
-	</div>
-	<div class="container m-5">
-		<form action="/updateresult/?username={{.Username}}" method="POST">
-			<div class="mb-3 form-floating">
-				<input
-					type="text"
-					class="form-control form-control-lg"
-					id="nameName"
-					name="nameName"
-					value="{{.Name}}"
-					autocomplete="off"
-				/>
-				<label for="name" class="form-label">Name</label>
-			</div>
-			<div class="mb-3 form-floating">
-				<input
-					type="text"
-					class="form-control form-control-lg"
-					id="UserName"
-					name="userName"
-					value="{{.Username}}"
-					autocomplete="off"
-				/>
-				<label for="Username" class="form-label">Username</label>
-			</div>
-			<div class="mb-3 form-floating">
-				<input
-					type="text"
-					class="form-control form-control-lg"
-					id="emailName"
-					name="emailName"
-					value="{{.Email}}"
-					autocomplete="off"
-				/>
-				<label for="Email" class="form-label">Email</label>
-			</div>
-			<input class="btn btn-success" type="submit" value="Update Product" />
-		</form>
-		<br />
-		<a href="/allusers">Back to all users</a>
-	</div>
-</body>

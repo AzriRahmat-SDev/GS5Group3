@@ -21,56 +21,60 @@
 			crossorigin="anonymous"
 		/>
 	</head>
-</html>
-<body class="bg-light">
-	<div class="container m-5">
-		<h1>Select A Location</h1>
-	</div>
-	<div class="container m-5">
-		<div class="container-fluid justify-content-end">
-			<nav
-				class="container-fluid navbar navbar-expand-lg navbar-dark bg-dark fs-4"
-			>
-				<a
-					class="btn btn-dark"
-					style="transform: skew(-10deg)"
-					href="/homepage/"
-					><span class="fs-4">Home</span></a
-				>
-				<a class="btn btn-dark" style="transform: skew(-10deg)" href="/user/"
-					><span class="fs-4">User Dashboard</span></a
-				>
-				<a class="btn btn-dark" style="transform: skew(-10deg)" href="/venues/"
-					><span class="fs-4">View Venues</span></a
-				>
-				<a class="btn btn-dark" style="transform: skew(-10deg)" href="/logout"
-					><span class="fs-4">Logout</span></a
-				>
-			</nav>
+
+	<body class="bg-light">
+		<div class="container m-5">
+			<h1>Select A Location</h1>
 		</div>
-		<table class="table">
-			<thread>
-				<tr>
-					<th scope="col">Venue</th>
-					<th scope="col">Address</th>
-				</tr>
-			</thread>
-			<tbody>
-				{{range .}}
-				<tr>
-					<td>{{.VenueName}}</td>
-					<td>{{.Address}}</td>
-					<td>
-						<a
-							class="btn btn-success"
-							href="/venues/viewvenueplots/?VenueName={{.VenueName}}"
-							role="button"
-							>See all Lots</a
-						>
-					</td>
-				</tr>
-				{{end}}
-			</tbody>
-		</table>
-	</div>
-</body>
+		<div class="container m-5">
+			<div class="container-fluid justify-content-end">
+				<nav
+					class="container-fluid navbar navbar-expand-lg navbar-dark bg-dark fs-4"
+				>
+					<a
+						class="btn btn-dark"
+						style="transform: skew(-10deg)"
+						href="/homepage/"
+						><span class="fs-4">Home</span></a
+					>
+					<a class="btn btn-dark" style="transform: skew(-10deg)" href="/user/"
+						><span class="fs-4">User Dashboard</span></a
+					>
+					<a
+						class="btn btn-dark"
+						style="transform: skew(-10deg)"
+						href="/venues/"
+						><span class="fs-4">View Venues</span></a
+					>
+					<a class="btn btn-dark" style="transform: skew(-10deg)" href="/logout"
+						><span class="fs-4">Logout</span></a
+					>
+				</nav>
+			</div>
+			<table class="table">
+				<thread>
+					<tr>
+						<th scope="col">Venue</th>
+						<th scope="col">Address</th>
+					</tr>
+				</thread>
+				<tbody>
+					{{range .}}
+					<tr>
+						<td>{{.VenueName}}</td>
+						<td>{{.Address}}</td>
+						<td>
+							<a
+								class="btn btn-success"
+								href="/venues/viewvenueplots/?VenueName={{.VenueName}}"
+								role="button"
+								>See all Lots</a
+							>
+						</td>
+					</tr>
+					{{end}}
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>
