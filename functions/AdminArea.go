@@ -97,7 +97,7 @@ func AddOrEditPlot(res http.ResponseWriter, req *http.Request) {
 			}
 
 		}
-		tpl.ExecuteTemplate(res, "addOrEdit.html", req)
+		tpl.ExecuteTemplate(res, "addeditplot.html", req)
 	}
 }
 
