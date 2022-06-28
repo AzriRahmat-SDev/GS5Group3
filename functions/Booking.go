@@ -255,7 +255,10 @@ func DeleteBooking(res http.ResponseWriter, req *http.Request) {
 		fmt.Println(string(data))
 
 		if response.StatusCode == 202 {
-			http.Redirect(res, req, "/homepage/", http.StatusSeeOther)
+			http.Redirect(res, req, "/user/", http.StatusSeeOther)
+			return
+		} else if response.StatusCode == 422 {
+			fmt.Fprintf(res, strconv.Itoa(response.StatusCode)+" - Booking was already marked as completed and can no longer be cancelled.")
 		} else {
 			fmt.Fprintf(res, strconv.Itoa(response.StatusCode))
 			return

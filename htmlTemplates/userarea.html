@@ -63,7 +63,7 @@
             </tbody>
             <tr>
                 <td><a href="/editbooking/?booking={{ .BookingID }}">{{ .BookingID }}</a></td>
-                <td><a href="/newbooking/?plot={{ .PlotID }}">{{ .PlotID }}</td>
+                <td><a href="/newbooking/?plot={{ .PlotID }}">{{ .PlotID }}</a></td>
                 <td>{{ .StartDate }}</td>
                 <td>{{ .EndDate }}</td>
                 <td>
@@ -78,10 +78,10 @@
         <table class="table">
             <thread>
                 <tr>
-                    <th>Booking ID</th>
-                    <th>Plot ID</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
+                    <th scope="col">Booking ID</th>
+                    <th scope="col">Plot ID</th>
+                    <th scope="col">Start Date</th>
+                    <th scope="col">End Date</th>
                 </tr>
             </thread>
             <tbody>
@@ -89,12 +89,13 @@
             </tbody>
             <tr>
                 <td>{{ .BookingID }}</td>
-                <td><a href="/newbooking/?plot={{ .PlotID }}">{{ .PlotID }}</td>
+                <td><a href="/newbooking/?plot={{ .PlotID }}">{{ .PlotID }}</a></td>
                 <td>{{ .StartDate }}</td>
                 <td>{{ .EndDate }}</td>
             </tr>
+            {{ end }}
         </table>
     </div>    
-    {{ end }}
+    
     </table>
 </body>

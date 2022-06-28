@@ -127,8 +127,8 @@ func bookingHandler(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusAccepted)
 				w.Write([]byte("202 - Booking canceled: " + bookingParam))
 			} else {
-				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte("404 - Booking has already been completed"))
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				w.Write([]byte("422 - Booking has already been completed"))
 			}
 		} else {
 			w.WriteHeader(http.StatusNotFound)
