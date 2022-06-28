@@ -463,6 +463,8 @@ func plotAvailable(desiredStartDate, desiredEndDate, bookingStartDate, bookingEn
 		return false
 	} else if desiredEndDateDate.Before(bookingEndDateDate) && desiredEndDateDate.After(bookingStartDateDate) {
 		return false
+	} else if desiredStartDateDate == bookingStartDateDate || desiredStartDateDate == bookingEndDateDate || desiredEndDateDate == bookingStartDateDate || desiredEndDateDate == bookingEndDateDate {
+		return false
 	} else {
 		return true
 	}
