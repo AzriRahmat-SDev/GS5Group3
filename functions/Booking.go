@@ -68,7 +68,7 @@ func NewBooking(res http.ResponseWriter, req *http.Request) {
 		defer wg.Done()
 		cookie, err := req.Cookie("myCookie")
 		if err != nil {
-			http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
+			tpl.ExecuteTemplate(res, "restricted.html", "You don't belong here")
 			return
 		}
 		user = getUser(cookie)
