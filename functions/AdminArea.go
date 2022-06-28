@@ -134,3 +134,10 @@ func DeletePlot(res http.ResponseWriter, req *http.Request) {
 	}
 
 }
+
+func AdminPage(res http.ResponseWriter, req *http.Request) {
+
+	if alreadyLoggedInAdmin(res, req) {
+		tpl.ExecuteTemplate(res, "adminpage.html", req)
+	}
+}
