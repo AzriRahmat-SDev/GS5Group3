@@ -61,3 +61,27 @@ func populateUserData(db *sql.DB) {
 		userList = append(userList, u)
 	}
 }
+
+// userExists takes a username and checks whether it currently exists in the database.
+func userExists(username string) (exists bool) {
+	// establish connection to database
+	db, err := sql.Open("mysql", connection)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
+	search, err := db.Query("SELECT EXISTS(SELECT * FROM database.users WHERE Username = '" + username + "')")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	for search.Next() {
+		err = search.Scan(&exists)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+
+	return exists
+}

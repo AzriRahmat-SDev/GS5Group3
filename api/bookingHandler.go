@@ -37,10 +37,22 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	var query string
 
 	if userParam != "" {
-		query = fmt.Sprintf("SELECT * FROM database.bookings WHERE Username='%s'", userParam)
+		if userExists(userParam) {
+			query = fmt.Sprintf("SELECT * FROM database.bookings WHERE Username='%s'", userParam)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("404 - Username does not exist"))
+			return
+		}
 	} else if plotParam != "" {
-		query = fmt.Sprintf("SELECT * FROM database.bookings WHERE PlotID='%s'", plotParam)
-	} else {
+		if plotDBRowExists(plotParam, "PlotID") {
+			query = fmt.Sprintf("SELECT * FROM database.bookings WHERE PlotID='%s'", plotParam)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("404 - PlotID does not exist"))
+			return
+		}
+	} else if userParam == "" && plotParam == "" {
 		query = fmt.Sprintf("SELECT * FROM database.bookings")
 	}
 
