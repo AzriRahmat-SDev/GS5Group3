@@ -338,6 +338,11 @@ func plotAvailable(plotID, startDate, endDate, bookingID string) (available bool
 			available = false
 			break
 		}
+
+		if startDateDate == tempStartDate || startDateDate == tempEndDate || endDateDate == tempStartDate || endDateDate == tempEndDate {
+			available = false
+			break
+		}
 	}
 
 	return available
