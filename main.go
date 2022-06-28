@@ -35,7 +35,6 @@ func main() {
 	r.HandleFunc("/allusers", functions.AllUsers)   //only admin
 	r.HandleFunc("/addeditplot", functions.AddOrEditPlot)
 	r.HandleFunc("/deleteplot", functions.DeletePlot)
-	r.HandleFunc("/adminpage", functions.AdminPage)
 	r.HandleFunc("/delete/", functions.DeleteRecord)       //both admin and users
 	r.HandleFunc("/update/", functions.Update)             //both admin and users
 	r.HandleFunc("/updateresult/", functions.UpdateResult) //both admin and users

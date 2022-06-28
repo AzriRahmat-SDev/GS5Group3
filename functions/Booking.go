@@ -154,7 +154,7 @@ func EditBooking(res http.ResponseWriter, req *http.Request) {
 
 		cookie, err := req.Cookie("myCookie")
 		if err != nil {
-			http.Redirect(res, req, "/loginauth", http.StatusSeeOther)
+			tpl.ExecuteTemplate(res, "restricted.html", "You don't belong here")
 			return
 		}
 		user = getUser(cookie)
