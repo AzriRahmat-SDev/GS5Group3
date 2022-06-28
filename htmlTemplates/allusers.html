@@ -1,39 +1,63 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<style>
-			a:link {
-				font: bold 11px Arial;
-				text-decoration: none;
-				background-color: #eeeeee;
-				color: #333333;
-				padding: 2px 6px 2px 6px;
-				border-top: 1px solid #cccccc;
-				border-right: 1px solid #333333;
-				border-bottom: 1px solid #333333;
-				border-left: 1px solid #cccccc;
-			}
-		</style>
+		<title>Admin Page</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+			crossorigin="anonymous"
+		/>
 	</head>
-	<body>
-		<div style="font-size: x-large">All Users</div>
-		<div>
-			<nav>
-				<div>
-					<ul>
-						<li>
-							<a href="/logoutAdmin"><strong>logout</strong></a>
-						</li>
-					</ul>
-				</div>
-			</nav>
-		</div>
-
-		{{range .}} Name: {{.Name}} Username: {{.Username}}<br />
-		Email: {{.Email}}<br />
-		<a href="/delete/?username={{.Username}}">Delete</a>
-		<a href="/update/?username={{.Username}}">Update</a>
-		<br /><br />
-		{{end}}
-	</body>
 </html>
+<body class="bg-light">
+	<div class="container m-5">
+		<h1>All Users</h1>
+	</div>
+	<div class="container m-5">
+		<nav
+			class="container-fluid navbar navbar-expand-lg navbar-dark bg-dark fs-4"
+		>
+			<a class="btn btn-dark" style="transform: skew(-10deg)" href="/logout"
+				><span class="fs-4">Logout</span></a
+			>
+		</nav>
+	</div>
+	<div class="container m-5">
+		<h2>All Available Accounts</h2>
+		<table class="table">
+			<thread>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Username</th>
+					<th scope="col">Email</th>
+				</tr>
+			</thread>
+			<tbody>
+				{{ range .}}
+				<tr>
+					<td>{{.Name}}</td>
+					<td>{{.Username}}</td>
+					<td>{{.Email}}</td>
+					<td>
+						<a
+							class="btn btn-danger"
+							href="/delete/?username={{.Username}}"
+							role="button"
+							>Delete</a
+						>
+					</td>
+					<td>
+						<a
+							class="btn btn-success"
+							href="/update/?username={{.Username}}"
+							role="button"
+							>Update</a
+						>
+					</td>
+				</tr>
+				{{end}}
+			</tbody>
+		</table>
+	</div>
+</body>
