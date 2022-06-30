@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+//alreadyLoggedIn checks for the cookie in the user session and allowing the user to have access to the appropriate handler
 func alreadyLoggedIn(res http.ResponseWriter, req *http.Request) bool {
 	_, err := req.Cookie("myCookie")
 
@@ -16,6 +17,7 @@ func alreadyLoggedIn(res http.ResponseWriter, req *http.Request) bool {
 	return true
 }
 
+//alreadyLoggedInAdmin checks for the cookie in the Admin session and allowing the Admin to have access to the appropriate handler
 func alreadyLoggedInAdmin(res http.ResponseWriter, req *http.Request) bool {
 	_, err := req.Cookie("myCookieAdmin")
 

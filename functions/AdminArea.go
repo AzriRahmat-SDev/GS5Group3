@@ -13,6 +13,7 @@ type Users struct {
 	Email    string `field:"Email"`
 }
 
+//AllUsers handles showing all users in the database.
 func AllUsers(res http.ResponseWriter, req *http.Request) {
 	if alreadyLoggedInAdmin(res, req) {
 		db := connectUserDB()
@@ -44,6 +45,7 @@ func AllUsers(res http.ResponseWriter, req *http.Request) {
 
 }
 
+//DeleteRecord handles deleting a selected user in the database.
 func DeleteRecord(res http.ResponseWriter, req *http.Request) {
 
 	if alreadyLoggedInAdmin(res, req) {

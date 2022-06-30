@@ -16,6 +16,10 @@ type updateUsers struct {
 	Email    string `field:"Email"`
 }
 
+/*SignUp handles either a GET or POST request.
+GET request returns a blank form
+PUT request will request a display name,username, password and email values which will be then stored in the user database.
+*/
 func SignUp(res http.ResponseWriter, req *http.Request) {
 
 	db := connectUserDB()
@@ -74,6 +78,9 @@ func SignUp(res http.ResponseWriter, req *http.Request) {
 
 }
 
+/*LoginAuth handles the authentication of the user details in the user database and logs the user in.
+Upon successful login,  a user session is created using a cookie.
+*/
 func LoginAuth(res http.ResponseWriter, req *http.Request) {
 	db := connectUserDB()
 	defer db.Close()
@@ -126,6 +133,7 @@ func LoginAuth(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+//Update handles the scanning of the username in the database
 func Update(res http.ResponseWriter, req *http.Request) {
 	db := connectUserDB()
 	defer db.Close()
@@ -148,6 +156,7 @@ func Update(res http.ResponseWriter, req *http.Request) {
 	tpl.ExecuteTemplate(res, "update.html", p)
 }
 
+//UpdateResults handles the updating of the users values
 func UpdateResult(res http.ResponseWriter, req *http.Request) {
 	db := connectUserDB()
 	defer db.Close()
