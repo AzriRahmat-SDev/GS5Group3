@@ -10,24 +10,31 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Plots GET
+/*
+ /api/v1/plots runs GetAllPlots (GET)
+ Gets all plots and returns it as a json with value {PlotID:{PlotID, VenueName, Address}}
+*/
 func GetAllPlots(w http.ResponseWriter, r *http.Request) {
 
 	pMap := makePlotMap("")
 	json.NewEncoder(w).Encode(pMap)
 }
 
-// Venue GET
+/*
+/api/v1/plots/venue runs venueHandler
+Gets all venues and returns it as a json with value {VenueName:Address}
+*/
 func venueHandler(w http.ResponseWriter, r *http.Request) {
 	venueMap := makeVenueMap()
 	json.NewEncoder(w).Encode(venueMap)
 }
 
-// GET Venue PlotIDs
+/*
+/api/v1/plots/venue/{VenueName} runs viewVenuePlots
+GET Venue PlotIDs based on VenueName given, then returns a json of PlotIDs.
+*/
 func viewVenuePlots(w http.ResponseWriter, r *http.Request) {
-
 	params := mux.Vars(r)
-
 	if plotDBRowExists(params["VenueName"], "VenueName") {
 		var plotIDs []string
 		pm := makePlotMap("")
@@ -40,6 +47,16 @@ func viewVenuePlots(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
+
+
+/api/v1/plots/{plotId} runs PlotHandler (GET, DELETE, POST, PUT)
+PlotHandler handles GET, DELETE, POST and PUT for individual PlotIDs:
+GET returns a json {PlotID:{PlotID, VenueName, Address}} based off what PlotID was given.
+DELETE will delete the respective PlotID given to the handler if it exists.
+POST will add a new PlotID, VenueName and Address depending on what plotid was given to it.
+PUT will either add a new PlotID if it does not exist, or alter the VenueName and Address depending on what the administrator fills it with.
+*/
 func PlotHandler(w http.ResponseWriter, r *http.Request) {
 	db := OpenVenueDB()
 	defer db.Close()
@@ -56,7 +73,6 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("404 - No Plot found from GET"))
 		}
 	}
-
 	if r.Method == "DELETE" {
 		if plotDBRowExists(params["plotid"], "PlotID") {
 			DeletePlot(db, params["plotid"])
@@ -127,13 +143,13 @@ func PlotHandler(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusUnprocessableEntity)
 				w.Write([]byte("422 - Please supply Plot information " + "in JSON format"))
 			}
-
 		}
 	}
 }
 
-/* Helper to find if val exists in column.
- */
+/*
+Helper to find if val exists in column.
+*/
 func plotDBRowExists(val string, column string) bool {
 	db := OpenVenueDB()
 	defer db.Close()
@@ -165,9 +181,7 @@ func makePlotMap(val string) PlotMap {
 			var p Plot
 			res.Scan(&p.PlotID, &p.VenueName, &p.Address)
 			plotMap[p.PlotID] = p
-
 		}
-
 	} else {
 		result, err := db.Query("SELECT * from database.plots WHERE PlotID = '" + val + "'")
 		if err != nil {

@@ -27,15 +27,10 @@ var plotList []string
 
 var VenueInformationList []VenueInformation
 
-// var venueListPulled bool = false
-
+// fills VenueInformationList
 func ViewVenues(res http.ResponseWriter, req *http.Request) {
 	if alreadyLoggedIn(res, req) {
-		// if !venueListPulled {
-		// to be called again by admins if any changes are made.
 		fillVenuesList()
-		// 	venueListPulled = true
-		// }
 		tpl.ExecuteTemplate(res, "venues.html", VenueInformationList)
 	}
 }
@@ -62,6 +57,7 @@ func fillVenuesList() {
 	sortVenueInfoList(VenueInformationList, 0, len(VenueInformationList)-1)
 }
 
+// quicksort
 func sortVenueInfoList(v []VenueInformation, left int, right int) {
 	if left < right {
 		pivotIndex := venueInfoPartition(v, left, right)
